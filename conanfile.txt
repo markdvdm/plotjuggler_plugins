@@ -1,0 +1,12 @@
+[requires]
+gtest/1.12.1
+pcapplusplus/22.11
+
+[generators]
+cmake_find_package
+cmake_paths
+CMakeDeps
+CMakeToolchain
+
+[layout]
+cmake_layout

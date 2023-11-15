@@ -1,0 +1,36 @@
+namespace ib.commands;
+
+/// This struct encodes commands for the VL motors
+struct VlCommands {
+  m1cmd_a : float;
+  m2cmd_a : float;
+  m3cmd_a : float;
+  m4cmd_a : float;
+  m5cmd_a : float;
+  m6cmd_a : float;
+  m7cmd_a : float;
+  m8cmd_a : float;
+}
+
+/// This struct encodes commands for the surface actuators
+struct SurfCommands {
+  surf1cmd_deg : float;
+  surf2cmd_deg : float;
+  surf3cmd_deg : float;
+  surf4cmd_deg : float;
+  surf5cmd_deg : float;
+  surf6cmd_deg : float;
+  surf7cmd_deg : float;
+  surf8cmd_deg : float;
+  surf9cmd_deg : float;
+  surf10cmd_deg : float;
+  surf11cmd_deg : float;
+}
+
+/// Message that encodes all actuator commands
+table ActuatorCommands {
+  vl_cmds : VlCommands;
+  surf_cmds : SurfCommands;
+}
+
+root_type ActuatorCommands;

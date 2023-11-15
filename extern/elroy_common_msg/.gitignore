@@ -1,0 +1,15 @@
+# build directory
+build
+
+# generated code
+**/generated/**
+
+# python stuff
+**/*.pyc
+
+# crc gen applet
+./scripts/a.out
+
+**/__pycache__/
+
+.vscode

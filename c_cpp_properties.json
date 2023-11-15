@@ -1,0 +1,6 @@
+{
+  "includePath": [
+    "${workspaceFolder}/**",
+    "~/.conan/data/**"
+  ]
+}

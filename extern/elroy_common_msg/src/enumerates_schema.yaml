@@ -1,0 +1,2259 @@
+---
+# common enumerates schema.
+#
+# Pretty standard generated enumerates. To note:
+#   1. generated enum `type` is calculated based on the number
+#      of entries. If the optional field `type` is included in
+#      the schema, the user-entered-value will be checked
+#      against the the number of entries
+#   2. BusObjectId enum is generated per the number of entries
+#      in bus_object_schema.yaml. This is the only enumerate
+#      generated into `enumerates/` that is not defined in
+#      this file
+#
+# Information on the set of available settings are as folows:
+#
+# - enum:
+#    name : NameofEnum (Required)
+#    type : fixed-width integer (u/int[8,16,32,64]_t, Optional)
+#    list :            (Required. yaml list syntax)
+#      - SomeEnum (At least 1 required, no numerals allowed)
+#      - AnotherEnum
+#
+#    # meta data that is added by elroy_common_msg_generator.py.
+#    # included here for the curious typer
+#    metadata :
+#      file :
+#        name : None       # name of file, no extension
+#        path : None       # aboslute path of the file, no extension
+#        header :
+#          extension: ".h"
+#          include_guard:  # header file include guard
+#          includes :      # list of header include files: parent classes, enums, etc
+#            - None
+#            - None
+
+# The following enumerations are used for automated testing. Please do not modify these enumerations. If necessary,
+# prefer to add more enumerations rather than modify existing ones.
+- enum:
+    name: TestEnum
+    list:
+      - FirstEnumValue
+      - SecondEnumValue
+      - ThirdEnumValue
+    brief_list:
+      - "first"
+      - "second"
+      - "third"
+    elaboration_list:
+      - "The first enumeration value"
+      - "The second enumeration value"
+      - "The third enumeration value"
+
+# END test enumerations
+
+- enum:
+    name: SystemComponentId
+    # identifies software components within FC
+    # does not distinguish instance
+    list:
+      - ActuatorFeedbackBus
+      - ActuatorFlightComputer
+      - ActuatorFlightComputerBootloader
+      - ActuatorInverse
+      - AirDataComputer
+      - BackupBattery
+      - CommandAndControl
+      - CommandDistributionBus
+      - ControlSurface
+      - DaaRadar
+      - DataLogger
+      - DataLoggerReceiver
+      - DebugLogger
+      - DebugLoggerReceiver
+      - ElroyCommonMsg
+      - EthernetSwitchAvionics
+      - EthernetSwitchGroundControlStation
+      - EthernetSwitchRobotics
+      - FlightControlsModeController
+      - FlightTerminationSystemGroundControlStation
+      - FlightTerminationSystemVehicle
+      - FogIns
+      - FpThruster
+      - GroundControlStation
+      - GroundControlStationComputer
+      - HighVoltageDcConverter
+      - InnerLoop
+      - LaserAltimeter
+      - LatchControlModule
+      - Lidar
+      - LineOfSightGroundControlStation
+      - LineOfSightVehicle
+      - LoadChannel
+      - MainFlightComputer
+      - MainFlightComputerBootloader
+      - MemsIns
+      - MissionManager
+      - Mixer
+      - MotionController
+      - OuterLoop
+      - PowerControlAndDistributionUnit
+      - PowerDistributionAndCircuitBreakerUnit
+      - RadarAltimeter
+      - RemoteControl
+      - RemoteControlReceiver
+      - SensorFusion
+      - TaxiCargoComputer
+      - ThrusterRateLimiter
+      - TrajectoryGenerator
+      - UltraWidebandBeacon
+      - UninterruptiblePowerSupplyGroundControlStation
+      - Vehicle
+      - VehicleControlPanel
+      - VlThruster
+      - TaxiController
+      - WinchController
+      - GrasperController
+    brief_list:
+      - "Act Fb"
+      - "AFC"
+      - "AFC Boot"
+      - "Act Inv"
+      - "ADC"
+      - "Bu Btry"
+      - "Cmd Ctl"
+      - "Cmd Dist"
+      - "CS"
+      - "DAA"
+      - "Log"
+      - "Log Rx"
+      - "Dbg"
+      - "Dbg Rx"
+      - "E C Msg"
+      - "Eth Av"
+      - "Eth GCS"
+      - "Eth Rob"
+      - "FC MC"
+      - "FTS GCS"
+      - "FTS Vhcl"
+      - "FOG"
+      - "FP"
+      - "GCS"
+      - "GCS Comp"
+      - "HV Cv"
+      - "Inr Loop"
+      - "Lasr Alt"
+      - "Latch"
+      - "Lidar"
+      - "LoS GCS"
+      - "LoS Vhcl"
+      - "Load Ch"
+      - "MFC"
+      - "MFC Boot"
+      - "MEMS"
+      - "Msn Mgr"
+      - "Mixer"
+      - "Mo Con"
+      - "Otr Loop"
+      - "Pwr Dist"
+      - "Pwr CB"
+      - "Rad Alt"
+      - "RC"
+      - "RC Rx"
+      - "Snsr Fus"
+      - "TC Comp"
+      - "Thr Lim"
+      - "Traj Gen"
+      - "UWB"
+      - "UPS GCS"
+      - "Vhcl"
+      - "VCP"
+      - "VL"
+      - "Txi Ctrl"
+      - "Wnh Ctrl"
+      - "Gsp Ctrl"
+    elaboration_list:
+      - "Actuator Feedback Bus"
+      - "Actuator Flight Computer: Allocortech Clio Series B"
+      - "Actuator Flight Computer: Ethernet Bootloader"
+      - "Actuator Inverse: GNC"
+      - "Air Data Computer: Aeroprobe Pegasus"
+      - "Backup Battery: Allocortech Lohner Smart Battery"
+      - "Command and Control Interpreter: GNC"
+      - "Command Distribution Bus"
+      - "Control Surface: Pegasus Actuator"
+      - "Detect and Avoid Radio Detection and Ranging"
+      - "Data Logger"
+      - "Data Logger Receiver"
+      - "Debug Logger"
+      - "Debug Logger Receiver"
+      - "Elroy Common Messages"
+      - "Ethernet Switch Avionics: EKI-7720G-4F"
+      - "Ethernet Switch Ground Control Station: EKI-7720G-4F"
+      - "Ethernet Switch Robotics: EKI-7720G-4F"
+      - "Flight Controls Mode Controller: GNC"
+      - "Flight Termination System Ground Control Station: Comet"
+      - "Flight Termination System Vehicle: Comet"
+      - "FOG Inertial Navigation System: KVH GEO-FOG 3D"
+      - "Forward Propulsion Thruster: Lecratek v1 Controller"
+      - "Ground Control Station"
+      - "Ground Control Station Computer"
+      - "High Voltage Direct Current Converter"
+      - "Inner Loop: GNC"
+      - "Laser Altimeter: Acuity AR3000"
+      - "Latch Control Module"
+      - "Lidar: Ouster OS1-32"
+      - "Line of Sight Ground Control Station: SC4480E-235-SBRT"
+      - "Line of Sight Vehicle: SC4240EP-235-EB"
+      - "Load Channel"
+      - "Main Flight Computer: Allocortech Clio Series B"
+      - "Main Flight Computer: Ethernet Bootloader"
+      - "MEMS Inertial Navigation System: VECTORNAV VN-310"
+      - "Mission Manager: GNC"
+      - "Mixer: GNC"
+      - "Motion Controller: Elmo Gold Maestro"
+      - "Outer Loop: GNC"
+      - "Power Control and Distribution Unit"
+      - "Power Distribution and Circuit Breaker Unit"
+      - "Radar Altimeter: Ainstein US-D1"
+      - "Remote Control Transmitter: FrSky TANDEM X20S"
+      - "Remote Control Receiver: FrSky ARCHER R10 PRO"
+      - "Sensor Fusion: GNC"
+      - "Taxi Cargo Computer: Neousys POC-545"
+      - "Thruster Command Rate Limiter"
+      - "Trajectory Generator: GNC"
+      - "Ultra-Wideband Beacon: Decawave DWM1001C"
+      - "Uninterruptible Power Supply Ground Control Station"
+      - "Vehicle: GNC"
+      - "Vehicle Control Panel"
+      - "Vertical Lift Thruster: MAGicALL MAGiDRIVE 75"
+      - "Taxi Controller"
+      - "Winch Controller"
+      - "GrasperController"
+- enum:
+    name: InstanceId
+    # elroy nomenclature for redundancy
+    list:
+      - One
+      - Two
+      - Three
+      - Four
+      - Five
+      - Six
+      - Seven
+      - Eight
+      - Nine
+      - Ten
+      - Eleven
+      - Twelve
+    brief_list:
+      - "1"
+      - "2"
+      - "3"
+      - "4"
+      - "5"
+      - "6"
+      - "7"
+      - "8"
+      - "9"
+      - "10"
+      - "11"
+      - "12"
+    elaboration_list:
+      - "A"
+      - "B"
+      - "C"
+      - "D"
+      - "E"
+      - "F"
+      - "G"
+      - "H"
+      - "I"
+      - "J"
+      - "K"
+      - "L"
+- enum:
+    name: AirframeLocation
+    # enumerates locations on the aircraft
+    list:
+      - Port
+      - Stbd
+      - Tail
+      - Fwd
+      - Aft
+      - Right
+      - Left
+    elaboration_list:
+      - "Port"
+      - "Starboard"
+      - "Tail"
+      - "Forward"
+      - "Aft"
+      - "Right"
+      - "Left"
+- enum:
+    name: MessageDecoderResult
+    # Enumerates result codes for MessageDecoder::Decode functions
+    list:
+      - SuccessfullyDecoded
+      - NotEnoughBytesToDecodeMessageId
+      - InvalidMessageId
+      - BufLenIsLessThanPackedSize
+      - InvalidCrc
+    elaboration_list:
+      - "The buffer was successfully decoded"
+      - "The buffer length was less than sizeof(MessageId) (2 bytes)"
+      - "Invalid Message ID at buf[0:1] location"
+      - "The buffer length was less than this message's packed size"
+      - "Calculated CRC did not match buffer CRC"
+- enum:
+    name: ReturnState
+    # Enumerates return values for elroy execution paths
+    list:
+      - GenericFailure
+      - Invalid
+      - Retry
+      - Success
+      - Unsupported
+    elaboration_list:
+      - "Execution failed for non-specific reasons"
+      - "Parameters, state, or data were invalid"
+      - "Data was unavailable for execution"
+      - "Execution succeeded"
+      - "Execution was not supported and/or enabled"
+- enum:
+    name: FlightComputerRunMode
+    list:
+      - Ground
+      - Flight
+      - Manufacture
+    brief_list:
+      - "Grnd Test"
+      - "Flight"
+      - "Mfg Test"
+    elaboration_list:
+      - "Ground Test Mode"
+      - "Flight Mode"
+      - "Manufacture Test Mode"
+
+# ----------------------------------- #
+# health definitions
+# ----------------------------------- #
+- enum:
+    name: ActuatorInverseHealthChecks
+    # Health checks for the Actuator Inverse GNC software item.
+    list:
+      - ThrusterSaturation
+      - SurfaceSaturation
+      - ThrusterHealth
+      - ElevatorHealth
+      - AileronHealth
+      - RudderHealth
+      - FlapsHealth
+      - PowerLimitClipping
+    elaboration_list:
+      - "Thruster Saturation"
+      - "Control Surface Saturation"
+      - "Thruster Health"
+      - "Elevator Health"
+      - "Aileron Health"
+      - "Rudder Health"
+      - "Flaps Health"
+      - "Power Limit Saturation - Degraded Overall Handling Qualities"
+- enum:
+    name: CommandAndControlInterpreterHealthChecks
+    # Health checks for the Command and Control Interpreter GNC software item.
+    list:
+      - RemoteControlRedundancy
+      - LosLink
+    elaboration_list:
+      - "Remote Control Redundancy"
+      - "Line of Sight Link"
+- enum:
+    name: ForwardPropulsionThrusterHealthChecks
+    # Health checks for a forward propulsion thruster.
+    list:
+      - CommsStatus
+      - ControllerStatus
+      - OverTemperature
+      - OverVoltage
+      - UnderVoltage
+      - OverCurrent
+      - OverSpeed
+      - IGBTTemp
+    elaboration_list:
+      - "Communications Status"
+      - "Controller Status"
+      - "Over Temperature"
+      - "Over Voltage"
+      - "Under Voltage"
+      - "Over Current"
+      - "Over Speed"
+      - "IGBT Temperature"
+
+- enum:
+    name: InnerLoopHealthChecks
+    # Health checks for the Inner Loop GNC software item.
+    list:
+      - TrackingError
+      - IntegratorWindup
+    elaboration_list:
+      - "Tracking Error"
+      - "Integrator Windup"
+- enum:
+    name: GcsCommandHealthChecks
+    # Health checks for the GCS command interface
+    list:
+      - CommsWatchdog
+      - LosRadioHealth
+    elaboration_list:
+      - "Communications Watchdog"
+      - "Line Of Sight Radio Health"
+- enum:
+    name: LosDatalinkHealthChecks
+    # Health checks for a line-of-sight datalink.
+    list:
+      - CommsWatchdog
+      - Snr
+      - CurrentTemperature
+      - Overheat
+      - CurrentVoltage
+      - UnderVoltage
+      - OverVoltage
+    elaboration_list:
+      - "Communications Watchdog"
+      - "Signal to Noise Ratio in Bounds"
+      - "Current Temperature in Bounds"
+      - "Overheat Occurrences"
+      - "Current Voltage in Bounds"
+      - "Undervoltage Occurrences"
+      - "Overvoltage Occurrences"
+- enum:
+    name: MemsInsHealthChecks
+    # Health checks for a MEMS INS.
+    list:
+      - BinaryPacketOneWatchdog
+      - BinaryPacketTwoWatchdog
+      - Tracking
+      - GnssStatus
+      - FailureDetected
+    elaboration_list:
+      - "Binary Packet One Watchdog"
+      - "Binary Packet Two Watchdog"
+      - "Tracking"
+      - "Global Navigation Satellite System (GNSS) Status"
+      - "Failure Detected"
+- enum:
+    name: MissionManagerHealthChecks
+    # Health checks for the Mission Manager GNC software item.
+    list:
+      - MissionError
+    elaboration_list:
+      - "Mission Error"
+- enum:
+    name: MixerHealthChecks
+    # Health checks for the Mixer GNC software item.
+    list:
+      - Clipped
+      - Converged
+      - PowerLimited
+      - PowerDeficit
+    elaboration_list:
+      - "Control Effector Clipped"
+      - "Cannot Converge On Solution"
+      - "Power Limit Saturation - Degraded Yaw Handling Qualities"
+      - "Power Limit Saturation - Degraded Overall Handling Qualities"
+- enum:
+    name: OuterLoopHealthChecks
+    # Health checks for the Outer Loop GNC software item.
+    list:
+      - TrackingError
+      - IntegratorWindup
+    elaboration_list:
+      - "Tracking Error"
+      - "Integrator Windup"
+- enum:
+    name: RemoteControlReceiverHealthChecks
+    # Health checks for remote control. Note that the comms watchdog
+    # is checked at the RC in on the AFC, the AFC feedback comms
+    # watchdog is checked on the AFC feedback bus at the MFC
+    list:
+      - CommsWatchdog
+      - AfcFeedbackCommsWatchdog
+    elaboration_list:
+      - "Communications Watchdog"
+      - "AFC Feedback Comms Watchdog"
+- enum:
+    name: SensorFusionHealthChecks
+    # Health checks for the Sensor Fusion GNC software item.
+    list:
+      - InsRedundancy
+      - AdsRedundancy
+      - AltimeterRedundancy
+      - GroundDetectorLossOfFunction
+    elaboration_list:
+      - "Inertial Navigation System Redundancy"
+      - "Air Data System Redundancy"
+      - "Radar Altimeter Redundancy"
+      - "Ground Detector Loss of Function"
+- enum:
+    name: VerticalLiftThrusterHealthChecks
+    # Health checks for a vertical lift thruster.
+    list:
+      - CommsWatchdog
+      - FaultDetected
+      - CommsRate
+      - Configuration
+    elaboration_list:
+      - "Communications Watchdog"
+      - "Fault Detected"
+      - "Communication Rate"
+      - "Configuration of Motor Controller"
+- enum:
+    name: LaserAltimeterHealthChecks
+    # Health checks for Acuity AR3000 laser altimeter
+    list:
+      - CommsWatchdog
+      - DeviceError
+      - SignalStrength
+    elaboration_list:
+      - "Communications Watchdog"
+      - "Device Error"
+      - "Signal Strength"
+- enum:
+    name: FogInsHealthChecks
+    # Health checks for the KVH dual GNSS antenna FOG INS
+    list:
+      - CommStatus
+      - SystemFailure
+      - AccelerometerStatus
+      - GyroscopeStatus
+      - MagnetometerStatus
+      - PressureStatus
+      - GnssStatus
+      - TemperatureAlarm
+      - VoltageAlarm
+      - SerialPortOverflowAlarm
+      - FilterStatus
+      - FilterDeviation
+    elaboration_list:
+      - "Communication Status"
+      - "System Status"
+      - "Accelerometer Status"
+      - "Gyroscope Status"
+      - "Magnetometer Status"
+      - "Pressure Status"
+      - "Global Navigation Satellite System (GNSS) Status"
+      - "Temperature Alarm"
+      - "Voltage Alarm"
+      - "Serial Port Overflow Alarm"
+      - "Filter Status"
+      - "Filter Deviation"
+
+- enum:
+    name: LowVoltageBackupBatteryHealthChecks
+    # Health checks for backup battery.
+    list:
+      - CommsWatchdog
+      - Undervoltage
+      - Overvoltage
+    elaboration_list:
+      - "Communications Watchdog"
+      - "Undervoltage"
+      - "Overvoltage"
+
+- enum:
+    name: ElectronicCircuitBreakerUnitHealthChecks
+    list:
+      - CommsWatchdog
+      - DcSupplyUndervoltage
+      - DcSupplyOvervoltage
+      - PoppedCircuitBreaker
+      - FaultDetected
+    elaboration_list:
+      - "Communications Watchdog"
+      - "DC Supply Undervoltage"
+      - "DC Supply Overvoltage"
+      - "Popped Circuit Breaker"
+      - "Fault Detected"
+
+- enum:
+    name: PowerControlDistributionUnitHealthChecks
+    list:
+      - CommsWatchdog
+      - VCUWarningDetected
+      - VCUFaultDetected
+      - BatteryOneFaultDetected
+      - BatteryTwoFaultDetected
+      - EngineFaultDetected
+      - GeneratorFaultDetected
+      - TCADerateDetected
+    elaboration_list:
+      - "Communications Watchdog"
+      - "Vehicle Control Unit (VCU) Warning Detected"
+      - "Vehicle Control Unit (VCU) Fault Detected"
+      - "Battery One Fault Detected"
+      - "Battery Two Fault Detected"
+      - "Engine Fault Detected"
+      - "Generator Fault Detected"
+      - "Torque Control Algorithm Derate Detected"
+
+- enum:
+    name: AfcFeedbackTransportHealthChecks
+    # Health checks for the AFC transport as monitored from the MFC (AFC feedback)
+    list:
+      - CommsWatchdog
+    elaboration_list:
+      - "Communications Watchdog"
+
+- enum:
+    name: MfcCommandDistTransportHealthChecks
+    # Health checks for the MFC transport as monitored from the AFC (command dist)
+    list:
+      - CommsWatchdog
+    elaboration_list:
+      - "Communications Watchdog"
+
+- enum:
+    name: HealthLevel
+    # Health levels as defined by FAA in Flightcrew Alerting Advisory Circular AC 25.1322-1
+    # https://www.faa.gov/regulations_policies/advisory_circulars/index.cfm/go/document.information/documentID/724843
+    type: uint8_t
+    list:
+      - Normal
+      - Advisory
+      - Caution
+      - Warning
+- enum:
+    name: RcSwitchState
+    type: uint8_t
+    list:
+      - Down
+      - Neutral
+      - Up
+- enum:
+    name: MotorDirection
+    type: uint8_t
+    list:
+      - Clockwise
+      - Counterclockwise
+
+- enum:
+    name: ActivePassiveRedundancyResult
+    type: uint8_t
+    list:
+      - Nominal0 # both signals valid, ID0 chosen
+      - Nominal1 # both signals valid, ID1 chosen
+      - ID0Only # ID1 invalid, ID0 chosen
+      - ID1Only # ID0 invalid, ID1 chosen
+      - NoSolution # no valid solution available
+
+# ----------------------------------- #
+# gcs_command_interface definitions
+# ----------------------------------- #
+- enum:
+    name: GcsRequestResponseState
+    # The immediate return value of a non-specific request to flight software's GCS command interface.
+    type: uint8_t
+    list:
+      - Accepted
+      - RejectedBusy
+      - RejectedInvalid
+    brief_list:
+      - "Accepted"
+      - "Rejected Busy"
+      - "Rejected Invalid"
+    elaboration_list:
+      - "Accepted"
+      - "Rejected Busy"
+      - "Rejected Invalid"
+- enum:
+    # The potentially delayed status of a non-specific request to flight software's GCS command interface.
+    name: GcsRequestStatusState
+    type: uint8_t
+    list:
+      - Canceled
+      - Failed
+      - Processing
+      - Succeeded
+    brief_list:
+      - "Canceled"
+      - "Failed"
+      - "Processing"
+      - "Succeeded"
+    elaboration_list:
+      - "Canceled"
+      - "Failed"
+      - "Processing"
+      - "Succeeded"
+- enum:
+    name: RebootType
+    # Reboot types are the different modes a hardware item can be rebooted to.
+    # This mirrors JumpToType in allocortech/bsp/reset.h.
+    list:
+      - RomLoader
+      - AcLoader
+      - Application
+
+# ----------------------------------- #
+# mode_control definitions
+# The following enums are not generated verbatim by GNC; see GNC section for additional mode control information.
+# ----------------------------------- #
+- enum:
+    name: ModeController
+    # This enumerate must remain consistent with `afc/codegen/ModeControllerEnum.h`
+    type: uint8_t
+    list:
+      - FlightControls
+      - Actuators
+      - HighVoltage
+      - Powerplant
+      - Taxi
+      - Cargo
+      - FlightComputerManagement
+      - Sensors
+      - AvionicsPower
+      - Communications
+      - Lighting
+      - VehicleModeManager
+    brief_list:
+      - "Flight Controls"
+      - "Actuators"
+      - "High Voltage"
+      - "Powerplant"
+      - "Taxi"
+      - "Cargo"
+      - "Flight Computers"
+      - "Sensors"
+      - "Avionics Power"
+      - "Communications"
+      - "Lighting"
+      - "Vehicle Mode"
+    elaboration_list:
+      - "Flight Controls"
+      - "Actuators"
+      - "High Voltage"
+      - "Powerplant"
+      - "Taxi"
+      - "Cargo"
+      - "Flight Computer Management"
+      - "Sensors"
+      - "Avionics Power"
+      - "Communications"
+      - "Lighting"
+      - "Vehicle Mode Manager"
+- enum:
+    name: Mode
+    # This enumerate must remain consistent with `afc/codegen/ModeEnum.h`
+    type: uint8_t
+    list:
+      - FlightControlsStandby
+      - FlightControlsPreflight
+      - FlightControlsOnMissionIdle
+      - FlightControlsOnMissionTakeoff
+      - FlightControlsOnMissionHover
+      - FlightControlsOnMissionHoverTaxi
+      - FlightControlsOnMissionTransition
+      - FlightControlsOnMissionCruise
+      - FlightControlsOnMissionLand
+      - FlightControlsExternalControlRc
+      - FlightControlsEmergency
+      - FlightControlsTerminate
+      - ActuatorsSafe
+      - ActuatorsActiveServoOnly
+      - ActuatorsActiveServoAndPropulsion
+      - ActuatorsShutdown
+      - ActuatorsTerminate
+      - HighVoltageSafe
+      - HighVoltageActiveBatteryOnly
+      - HighVoltageActiveBatteryPlusTaxi
+      - HighVoltageActiveBatteryPlusPropulsion
+      - HighVoltageActiveBatteryPlusPropulsionPlusTaxi
+      - HighVoltageTerminate
+      - PowerplantSafe
+      - PowerplantReadyToStart
+      - PowerplantIdle
+      - PowerplantPreGenerating
+      - PowerplantGenerating
+      - PowerplantTerminate
+      - TaxiSafe
+      - TaxiBrakeRelease
+      - TaxiActive
+      - TaxiTerminate
+      - CargoSafe
+      - CargoWinchRelease
+      - CargoActive
+      - CargoFlight
+      - CargoTerminate
+      - FlightComputerManagementBuiltInTest
+      - FlightComputerManagementActive
+      - FlightComputerManagementConfig
+      - SensorsStandby
+      - SensorsGroundOps
+      - SensorsFlightOps
+      - AvionicsPowerActive
+      - AvionicsPowerLowPower
+      - AvionicsPowerTerminate
+      - CommunicationsStandby
+      - CommunicationsActive
+      - LightingStandby
+      - LightingGroundOps
+      - LightingFlightOps
+      - LightingTerminate
+      - VehicleModeSafe
+      - VehicleModeConfig
+      - VehicleModeShoreRecharge
+      - VehicleModeEngineOps
+      - VehicleModeFlightOps
+      - VehicleModeGroundOps
+      - VehicleModeTerminate
+      # @todo SIM-590 Ensure this enum is the same as GNC enum definition
+      - Invalid
+    brief_list:
+      - "Standby"
+      - "Preflight"
+      - "Idle"
+      - "Takeoff"
+      - "Hover"
+      - "Hover Taxi"
+      - "Transition"
+      - "Cruise"
+      - "Land"
+      - "Ext Cntl RC"
+      - "Emergency"
+      - "Terminate"
+      - "Safe"
+      - "Servo Only"
+      - "Servo + Prop"
+      - "Shutdown"
+      - "Terminate"
+      - "Safe"
+      - "Battery Only"
+      - "Battery + Taxi"
+      - "Battery + Prop"
+      - "Btry + Prp + Txi"
+      - "Terminate"
+      - "Safe"
+      - "Ready To Start"
+      - "Idle"
+      - "Pre-Generating"
+      - "Generating"
+      - "Terminate"
+      - "Safe"
+      - "Brake Release"
+      - "Active"
+      - "Terminate"
+      - "Safe"
+      - "Winch Release"
+      - "Active"
+      - "Flight"
+      - "Terminate"
+      - "Built-in-test"
+      - "Active"
+      - "Config"
+      - "Standby"
+      - "Ground Ops"
+      - "Flight Ops"
+      - "Active"
+      - "Low Power"
+      - "Terminate"
+      - "Standby"
+      - "Active"
+      - "Standby"
+      - "Ground Ops"
+      - "Flight Ops"
+      - "Terminate"
+      - "Safe"
+      - "Config"
+      - "Shore Recharge"
+      - "Engine Ops"
+      - "Flight Ops"
+      - "Ground Ops"
+      - "Terminate"
+      - "Invalid"
+    elaboration_list:
+      - "Flight Controls - Standby"
+      - "Flight Controls - Preflight"
+      - "Flight Controls - On Mission - Idle"
+      - "Flight Controls - On Mission - Takeoff"
+      - "Flight Controls - On Mission - Hover"
+      - "Flight Controls - On Mission - Hover Taxi"
+      - "Flight Controls - On Mission - Transition"
+      - "Flight Controls - On Mission - Cruise"
+      - "Flight Controls - On Mission - Land"
+      - "Flight Controls - External Control - Remote Control"
+      - "Flight Controls - Emergency"
+      - "Flight Controls - Terminate"
+      - "Actuators - Safe"
+      - "Actuators - Active - Servo Only"
+      - "Actuators - Active - Servo and Propulsion"
+      - "Actuators - Shutdown"
+      - "Actuators - Terminate"
+      - "High Voltage - Safe"
+      - "High Voltage - Active - Battery Only"
+      - "High Voltage - Active - Battery and Taxi"
+      - "High Voltage - Active - Battery and Propulsion"
+      - "High Voltage - Active - Battery and Propulsion and Taxi"
+      - "High Voltage - Terminate"
+      - "Powerplant - Safe"
+      - "Powerplant - Ready To Start"
+      - "Powerplant - Idle"
+      - "Powerplant - Pre-Generating"
+      - "Powerplant - Generating"
+      - "Powerplant - Terminate"
+      - "Taxi - Safe"
+      - "Taxi - Brake Release"
+      - "Taxi - Active"
+      - "Taxi - Terminate"
+      - "Cargo - Safe"
+      - "Cargo - Winch Release"
+      - "Cargo - Active"
+      - "Cargo - Flight"
+      - "Cargo - Terminate"
+      - "Flight Computer Management - Built-in-test"
+      - "Flight Computer Management - Active"
+      - "Flight Computer Management - Config"
+      - "Sensors - Standby"
+      - "Sensors - Ground Operations"
+      - "Sensors - Flight Operations"
+      - "Avionics Power - Active"
+      - "Avionics Power - Low Power"
+      - "Avionics Power - Terminate"
+      - "Communications - Standby"
+      - "Communications - Active"
+      - "Lighting - Standby"
+      - "Lighting - Ground Operations"
+      - "Lighting - Flight Operations"
+      - "Lighting - Terminate"
+      - "Vehicle Mode - Safe"
+      - "Vehicle Mode - Config"
+      - "Vehicle Mode - Shore Recharge"
+      - "Vehicle Mode - Engine Operations"
+      - "Vehicle Mode - Flight Operations"
+      - "Vehicle Mode - Ground Operations"
+      - "Vehicle Mode - Terminate"
+      - "Invalid"
+
+- enum:
+    name: ModeRequestReturn
+    # Request returns are the immediate return values of any mode request on a mode controller.
+    # This mirrors AFC_Code/3.AFC_code_M/VehicleModeManager/ModeRequestReturnEnum.m.
+    type: uint8_t
+    list:
+      - AcceptedProcessing
+      - AcceptedAlreadyInMode
+      - RejectedBusy
+      - RejectedInvalidControllerType
+      - RejectedInvalidModeType
+    brief_list:
+      - "Processing"
+      - "Already in Mode"
+      - "Busy"
+      - "Inv Controller"
+      - "Inv Mode"
+    elaboration_list:
+      - "Accepted - Processing"
+      - "Accepted - Already in Mode"
+      - "Rejected - Busy"
+      - "Rejected - Invalid Controller Type"
+      - "Rejected - Invalid Mode Type"
+
+# ----------------------------------- #
+# ETC definitions
+# ----------------------------------- #
+- enum:
+    name: EtcObjectiveState
+    # ETC Objective State is the current state of an ETC.
+    # This logically (but not numerically) matches etcObjectiveState in AFC_Code/3.AFC_code_M/ETC/README.md.
+    type: uint8_t
+    list:
+      - Idle
+      - Active
+      - Complete
+      - Erred
+- enum:
+    name: EtcChannel
+    # ETC Channel is where the ETC signal will be injected.
+    # This mirrors AFC_Code/3.AFC_code_M/ETC/EtcChannelEnum.m.
+    type: uint8_t
+    list:
+      # NullChannel is considered equivalent to Unknown based on usage in models
+      - InnerLoopPitchClosed
+      - InnerLoopPitchFeedback
+      - InnerLoopPitchBroken
+      - InnerLoopRollClosed
+      - InnerLoopRollFeedback
+      - InnerLoopRollBroken
+      - InnerLoopYawClosed
+      - InnerLoopYawFeedback
+      - InnerLoopYawBroken
+      - InnerLoopHeaveClosed
+      - InnerLoopHeaveFeedback
+      - InnerLoopHeaveBroken
+      - OuterLoopVtolForwardVelocityClosed
+      - OuterLoopVtolForwardVelocityFeedback
+      - OuterLoopVtolLateralVelocityClosed
+      - OuterLoopVtolLateralVelocityFeedback
+      - OuterLoopVtolForwardPositionClosed
+      - OuterLoopVtolForwardPositionFeedback
+      - OuterLoopVtolLateralPositionClosed
+      - OuterLoopVtolLateralPositionFeedback
+      - OuterLoopVtolDownPositionClosed
+      - OuterLoopVtolDownPositionFeedback
+- enum:
+    name: EtcSignalType
+    # ETC Objective State is the current state of an ETC.
+    # This logically matches signalType in AFC_Code/3.AFC_code_M/ETC/README.md.
+    type: uint8_t
+    list:
+      - Sweep
+      - Doublet
+- enum:
+    name: GenericEtcType
+    # The type of generic ETC being requested.
+    # Each enumeration comment describes the usage of the parameter array starting at index 0; each parameter is separated with a semicolon.
+    type: uint8_t
+    list:
+      - ControlSurfaceCommand # Current value
+      - VerticalLiftThrusterSetCommand # Thruster index [1, 8]; Current/RPM value
+      - VerticalLiftThrusterSetAllCommand # Current/RPM value for Thruster index [1, 8]
+      - ForwardPropulsionThrusterSetCommand # Thruster index [1, 4]; Current/RPM value
+      - ForwardPropulsionThrusterSetAllCommand # Current/RPM value for Thruster Indeces [1,4]
+      - VerticalLiftAndForwardPropulsionSetAllCommand # vl motor cmd (amps); fp motor cmd (amps)
+      - ClearMotorFaultsCommand # Clears VL and FP motor faults; no params
+      - LoadControlCommand # see EtcLoadControlCommand in bus_object_schema.yaml
+      - HVBatteryContactorOverrideCommand # 0 - disable, 1 - enable
+      - MotorContactorOverrideCommand # 0 - disable , 1 - enable
+      - RemoteControlSetLinkHealth # Param 0: start/stop, Param 1: RC0 (stbd) health Param 2: RC1 (port) health
+      - EcbuSetSwitchCommand # ECBU A (0) or B (1); ECB ID (0 - 24 where 0 = all); Command Value (see ICD)
+      - EcbuSetBreakerCommand # ECBU A (0) or B (1); ECB ID (0 - 24 where 0 = all); Command Value (see ICD)
+      - LVBackupBatteryClearFaults # see EtcParamsLVBackupBatteryClearFaults in bus_object_schema.yaml
+      - LVBackupBatterySetDetachAttach # see EtcParamsLVBackupBatterySetDetachAttach in bus_object_schema.yaml
+      - LVBackupBatterySetChargeCurrent # see EtcParamsLVBackupBatterySetChargeCurrent in bus_object_schema.yaml
+      - PowerplantSetTorqueControlMode # 0 = disabled torque control algorithm, 1 = enabled torque control algorithm
+      - PowerplantSetMasterSwitch # 0 - disabled, 1 - enabled
+      - PowerplantSetTargetStateOfCharge # float percentage
+      - PowerplantClearFaults # no arguments
+      - PowerplantEngineStop # no arguments
+      - PowerplantQuietCommand # 0 - disable, 1 - enable (PCDU is quiet i.e. does not command)
+      - PowerplantResetBMSCommand # Front (1), Back (2) Battery Management Systems to reset
+      - PowerplantBattleMode # Target (Pcdu, BmsOne, BmsTwo); Enable (1) or Disable (2)
+      - PowerplantSetGeneratorTorque # Torque ramp rate in Nm/s, Target torque in Nm
+      - PowerplantSetBMSMode # Front (1), Back (2), Requested Mode (1 - 5 per PcduBmsModeCommand)
+      - KnockItOff # No params, safely ramp down powertrain and thrusters
+
+    brief_list:
+      - "Set CS Cur Cmd"
+      - "Set VL Cmd"
+      - "Set All VL Cmd"
+      - "Set FP Cmd"
+      - "Set All FP Cmd"
+      - "Set All Th Cmd"
+      - "Clr Mtr Flt"
+      - "Load Ctrl Cmd"
+      - "HVBatt Cont Cmd"
+      - "Motor Cont Cmd"
+      - "Set RC Health"
+      - "Set ECBU Sw Cmd"
+      - "Set ECBU Br Cmd"
+      - "Clr LV Btry Flt"
+      - "Set LV Detach"
+      - "Set LV Chg Cur"
+      - "Set Trq Mode"
+      - "Eng Mstr Sw On"
+      - "Set Pwr Tgt SoC"
+      - "Clr Pwr Flt"
+      - "Stop Eng"
+      - "PCDU Quiet Cmd"
+      - "PCDU Reset BMS"
+      - "PCDU Btle Mode"
+      - "Set Gen Trq"
+      - "Set BMS Mode"
+      - "Knock It Off"
+
+    elaboration_list:
+      - "Control Surface Command"
+      - "Set Vertical Lift Thruster Command"
+      - "Set All Vertical Lift Thrusters Command"
+      - "Set Forward Propulsion Thruster Command"
+      - "Set All Forward Propulsion Thrusters Command"
+      - "Set All Thrusters Command"
+      - "Clear Motor Faults Command"
+      - "Load Control Command"
+      - "Set High Voltage Battery Contactor Override Command"
+      - "Set Motor Contactor Override Command"
+      - "Set Remote Control Link Health"
+      - "Set Electronic Circuit Breaker Unit Switch Command"
+      - "Set Electronic Circuit Breaker Unit Breaker Command"
+      - "Clear Low Voltage Backup Battery Faults"
+      - "Set Low Voltage Backup Battery Detached State"
+      - "Set Low Voltage Backup Battery Charge Current"
+      - "Set Powerplant Torque Control Mode"
+      - "Set Engine Master Switch"
+      - "Set Powerplant Target State of Charge"
+      - "Clear Powerplant Faults"
+      - "Stop Powerplant Engine"
+      - "Set Powerplant Quiet Command"
+      - "Reset Powerplant Battery Management System Command"
+      - "Set Powerplant Battle Mode"
+      - "Set Generator/Inverter Torque"
+      - "Set Battery Management System Mode"
+      - "Knock It Off"
+
+# ----------------------------------- #
+# mission_control definitions
+# ----------------------------------- #
+- enum:
+    name: MissionState
+    # Mission State is the current state of a mission plan used by the Mission Manager.
+    # This mirrors AFC_Code/3.AFC_code_M/MissionManager/MissionStateEnum.m.
+    type: uint8_t
+    list:
+      - NoMission
+      - Accepted
+      - InProgress
+      - Complete
+      - Error
+
+# ----------------------------------- #
+# PDCU
+# ----------------------------------- #
+- enum:
+    name: PdcuModes
+    type: uint8_t
+    list:
+      # quotes on On/Off are required, without gen script will render as boolean False/True
+      - "Off"
+      - ShoreCharging
+      - HighVoltageActive
+      - Idle
+      - EngineRevUp
+      - PreGen
+      - Generating
+      - EngineRevDown
+      - EngineShutdown
+      - PowertrainShutdown
+      - Maintenance
+    brief_list:
+      - "Off"
+      - "Shore Charging"
+      - "HV Active"
+      - "Idle"
+      - "Engine Rev Up"
+      - "Pre-gen"
+      - "Gen"
+      - "Eng Rev Down"
+      - "Eng Shutdown"
+      - "Powt Shutdown"
+      - "Maint"
+    elaboration_list:
+      - "Off"
+      - "Shore Charging"
+      - "High Voltage Active"
+      - "Idle"
+      - "Engine Rev Up"
+      - "Pre-generating"
+      - "Generating"
+      - "Engine Rev Down"
+      - "Engine Shutdown"
+      - "Powertrain Shutdown"
+      - "Maintenance"
+- enum:
+    name: PdcuBattleModeBitfield
+    type: uint8_t
+    list:
+      # note that the enumerate's numerical value is not meant to match
+      #      the PCDU enum value
+      - PCDU
+      - BMSOne
+      - BMSTwo
+    brief_list:
+      - "PCDU"
+      - "BMS 1"
+      - "BMS 2"
+- enum:
+    name: PdcuSequence
+    # note that the enumerate's numerical value is not meant to match
+    #      the PCDU enum value
+    type: uint8_t
+    list:
+      - ExitShoreCharging
+      - EnterShoreCharging
+      - HighVoltageStart
+      - OpenMotorContacts
+      - CloseMotorContacts
+      - OpenTaxiContacts
+      - CloseTaxiContacts
+      - Start
+      - EngineRevUp
+      - PowertrainShutdown
+      - EngineShutdown
+      - EngineRevDown
+      - ExitMaintenance
+      - EnterMaintenance
+    brief_list:
+      - "Exit Charging"
+      - "Enter Charging"
+      - "HV Start"
+      - "Open Mtr Cont"
+      - "Close Motor Cont"
+      - "Open Taxi Cont"
+      - "Close Taxi Cont"
+      - "Start"
+      - "Eng Rev Up"
+      - "Powt Shutdown"
+      - "Eng Shutdown"
+      - "Eng Rev Down"
+      - "Exit Maint"
+      - "Enter Maint"
+    elaboration_list:
+      - "Exit Shore Charging"
+      - "Enter Shore Charging"
+      - "High Voltage Start"
+      - "Open Motor Contacts"
+      - "Close Motor Contacts"
+      - "Open Taxi Contacts"
+      - "Close Taxi Contacts"
+      - "Start"
+      - "Engine Rev Up"
+      - "Powertrain Shutdown"
+      - "Engine Shutdown"
+      - "Engine Rev Down"
+      - "Exit Maintenance"
+      - "Enter Maintenance"
+- enum:
+    name: PdcuSequenceControl
+    type: uint8_t
+    list:
+      - Stop
+      - Run
+    brief_list:
+      - "Stop"
+      - "Run"
+    elaboration_list:
+      - "Stop"
+      - "Run"
+- enum:
+    name: PdcuSequenceStatus
+    type: uint8_t
+    list:
+      - Stopped
+      - AbortedFailedToPass
+      - AbortedByFault
+      - AbortedUndefinedInput
+      - AbortedUnknownReason
+      - Idle
+      - Running
+      - Completed
+    brief_list:
+      - "Stopped"
+      - "Failed To Pass"
+      - "Fault"
+      - "Undefined Input"
+      - "Unknown Failure"
+      - "Idle"
+      - "Running"
+      - "Completed"
+    elaboration_list:
+      - "Stopped"
+      - "Aborted - Failed To Pass"
+      - "Aborted - Fault"
+      - "Aborted - Undefined Input"
+      - "Aborted - Unknown Reason"
+      - "Idle"
+      - "Running"
+      - "Completed"
+- enum:
+    name: PdcuSequenceRequestStatus
+    # note: using Unknown = 0 -> PCDU's Undefined = 0
+    type: uint8_t
+    list:
+      - AcceptedProcessing
+      - AlreadyAccepted
+      - RejectedSequenceRunning
+      - RejectedUndefinedSequence
+      - RejectedInvalidMode
+      - RejectedFaultActive
+    brief_list:
+      - "Processing"
+      - "Req Accepted"
+      - "Seq Running"
+      - "Undefined Seq"
+      - "Invalid Mode"
+      - "Fault Active"
+    elaboration_list:
+      - "Accepted Processing"
+      - "Already Accepted"
+      - "Rejected - Sequence Running"
+      - "Rejected - Undefined Sequence"
+      - "Rejected - Invalid Mode"
+      - "Rejected - Fault Active"
+- enum:
+    name: PdcuEngineMode
+    type: uint8_t
+    list:
+      - Stop
+      - Start
+      - IdleOne
+      - IdleTwo
+      - Flight
+      - Cool
+      - ColdStart
+      - FalseStart
+      - DegradN1
+      - DegradN2
+    brief_list:
+      - "Stop"
+      - "Start"
+      - "Idle 1"
+      - "Idle 2"
+      - "Flight"
+      - "Cool"
+      - "Cold Start"
+      - "False Start"
+      - "Degrade N1"
+      - "Degrade N2"
+    elaboration_list:
+      - "Stop"
+      - "Start"
+      - "Idle One"
+      - "Idle Two"
+      - "Flight"
+      - "Cool"
+      - "Cold Start"
+      - "False Start"
+      - "Degraded N1"
+      - "Degraded N2"
+- enum:
+    name: PdcuEngineFuelPumpStates
+    type: uint8_t
+    list:
+      - BothPumpsOff
+      - PumpOneOn
+      - PumpTwoOn
+      - BothPumpsOn
+    brief_list:
+      - "Both Pumps Off"
+      - "Pump One On"
+      - "Pump Two On"
+      - "Both Pumps On"
+    elaboration_list:
+      - "Both Pumps Off"
+      - "Pump One On"
+      - "Pump Two On"
+      - "Both Pumps On"
+- enum:
+    name: PdcuGeneratorStatusEnum
+    type: uint8_t
+    list:
+      - NotReady
+      - Shutdown
+      - Precharge
+      - Energize
+      - Enabled
+      - FaultReaction
+      - FaultedOff
+      - ActiveShort
+    brief_list:
+      - "Not Ready"
+      - "Shutdown"
+      - "Precharge"
+      - "Energize"
+      - "Enabled"
+      - "Fault Reaction"
+      - "Faulted Off"
+      - "Active Short"
+    elaboration_list:
+      - "Not Ready"
+      - "Shutdown"
+      - "Precharge"
+      - "Energize"
+      - "Enabled"
+      - "Fault Reaction"
+      - "Faulted Off"
+      - "Active Short"
+- enum:
+    name: BmsState
+    type: uint8_t
+    list:
+      - InternalError
+      - Sleep
+      - Startup
+      - Idle
+      - Precharge
+      - Active
+      - Fault
+      - StringResistorBalancing
+      - StringEsrBalancing
+    brief_list:
+      - "Internal Error"
+      - "Sleep"
+      - "Startup"
+      - "Idle"
+      - "Precharge"
+      - "Active"
+      - "Fault"
+      - "Str Res Bal"
+      - "Str ESR Bal"
+    elaboration_list:
+      - "Internal Error"
+      - "Sleep"
+      - "Startup"
+      - "Idle"
+      - "Precharge"
+      - "Active"
+      - "Fault"
+      - "String Resistor Balancing"
+      - "String ESR Balancing"
+- enum:
+    name: BmsIdentity
+    type: uint8_t
+    list:
+      - Front
+      - Rear
+- enum:
+    name: BmsSystemStatusBitmask
+    type: uint8_t
+    list:
+      - PrechargeRelay
+      - ContactorPositive
+      - ContactorNegative
+      - HvilIn
+      - BmsMonitorPower
+      - CellBalancing
+      - StringContactorPositive
+      - StringContactorNegativeAndPrecharge
+      - AddressOffset
+      - HvilPcdu
+      - HvilBattery
+      - CalibrationComplete
+      - CalibrationSuccess
+      - AtRest
+      - BattleMode
+    brief_list:
+      - "Precharge Relay"
+      - "Cont +"
+      - "Cont -"
+      - "HVIL In"
+      - "BMS Mon Power"
+      - "Cell Balance"
+      - "String Cont +"
+      - "String Cont -"
+      - "Addr Offset"
+      - "HVIL PCDU"
+      - "HVIL Battery"
+      - "Cal Complete"
+      - "Cal Success"
+      - "At Rest"
+      - "Battle Mode"
+    elaboration_list:
+      - "Precharge Relay"
+      - "Contactor Positive"
+      - "Contactor Negative"
+      - "High Voltage Interlock Loop In"
+      - "Battery Management System Monitor Power"
+      - "Cell Balancing"
+      - "String Contactor Positive"
+      - "String Contactor Negative and Precharge"
+      - "Address Offset"
+      - "High Voltage Interlock Loop PCDU"
+      - "High Voltage Interlock Loop Battery"
+      - "Calibration Complete"
+      - "Calibration Success"
+      - "At Rest"
+      - "Battle Mode"
+- enum:
+    name: BatteryIsolationStatus
+    type: uint8_t
+    list:
+      - Inactive
+      - Active
+    brief_list:
+      - "Inactive"
+      - "Active"
+    elaboration_list:
+      - "Inactive"
+      - "Active"
+- enum:
+    name: EngineFaultActiveStatus
+    type: uint8_t
+    list:
+      - NoError
+      - ErrorActive
+    brief_list:
+      - "No Error"
+      - "Error Active"
+    elaboration_list:
+      - "No Error"
+      - "Error Active"
+- enum:
+    name: ShoreChargingState
+    type: uint8_t
+    list:
+      - NotCharging
+      - SetContactorsToChargeFront
+      - SetContactorsToChargeRear
+      - SetContactorsToChargeBoth
+      - Charging
+      - OpenContactors
+    brief_list:
+      - "Not Charging"
+      - "Set Charge Front"
+      - "Set Charge Rear"
+      - "Set Charge Both"
+      - "Charging"
+      - "Open Cont"
+    elaboration_list:
+      - "Not Charging"
+      - "Set Contactors To Charge Front"
+      - "Set Contactors To Charge Rear"
+      - "Set Contactors To Charge Both"
+      - "Charging"
+      - "Open Contactors"
+- enum:
+    name: ShoreChargingContactorsStates
+    type: uint8_t
+    list:
+      - Open
+      - FrontClosed
+      - RearClosed
+      - BothClosed
+    brief_list:
+      - "Open"
+      - "Front Closed"
+      - "Rear Closed"
+      - "Both Closed"
+    elaboration_list:
+      - "Open"
+      - "Front Closed"
+      - "Rear Closed"
+      - "Both Closed"
+- enum:
+    name: PdcuInverterPulseDetection
+    type: uint8_t
+    list:
+      - NoPulseDetected
+      - PulseDetected
+    brief_list:
+      - "No Pulse"
+      - "Pulse"
+    elaboration_list:
+      - "No Pulse Detected"
+      - "Pulse Detected"
+- enum:
+    name: PdcuControlState
+    type: uint8_t
+    list:
+      # quotes on On/Off are required, without gen script will render as boolean False/True
+      - "Off"
+      - "On"
+    brief_list:
+      - "Off"
+      - "On"
+    elaboration_list:
+      - "PCDU Control Off"
+      - "PCDU Control On"
+- enum:
+    # note: this enumerate defines the bit fields for all 7 bytes of the 'PCDU
+    #       Actuator And Sensor States' CAN message (ID: 0x1D000130).
+    #       The enumerates will go in assending order from least significant
+    #       bit, with "reservedX" for unused bit-indeces, note this is base-1
+    #       due to ECM enumerate standard Unknown = 0, Count = N+1
+    #
+    #       usage:
+    #         bytes_[7] {0x0000000}
+    #         for(int i = 0; i < 7; i++) {
+    #           for(int bit = 0; bit < 8: bit++) {
+    #             if (bytes[i] & (1 << bit)) {
+    #               ECMEnum = static_cast<PdcuActuatorAndSensorStatesBitFields>(i + bit);
+    #             }
+    #           }
+    #         }
+    name: PdcuActuatorAndSensorStatesBitFields
+    type: uint8_t
+    list:
+      - HVILBatteryOne
+      - HVILBatteryTwo
+      - HVILTaxiOne
+      - HVILTaxiTwo
+      - HVILMotorLeftWing
+      - HVILMotorRightWing
+      - HVILMotorShoreCharger
+      - HVILHVDCDCConverter
+      - HVILGenerator
+      - ReservedOne
+      - ReservedTwo
+      - ReservedThree
+      - EngineConnectorSense
+      - AvionicsConnectSenseA
+      - AvionicsConnectSenseB
+      - ReservedFour
+      - GeneratorContactorAuxA
+      - GeneratorContactorAuxB
+      - ReservedFive
+      - ReservedSix
+      - GeneratorHallSensorOCD
+      - BatteryHallSensorOCD
+      - ReservedSeven
+      - ReservedEight
+      - PrechargeTaxiStatus
+      - PrechargeShoreStatus
+      - PrechargeMotorStatus
+      - PrechargeGeneratorStatus
+      - MotorContactorAuxA
+      - MotorContactorAuxAVAB
+      - MotorContactorAuxAVBB
+      - MotorContactorAuxC
+      - MotorContactorA
+      - MotorContactorB
+      - MotorContactorC
+      - ReservedNine
+      - GenContactControlA
+      - GenContactControlB
+      - ReservedTen
+      - ReservedEleven
+      - TaxiContactorControl
+      - ReservedTwelve
+      - ReservedThirteen
+      - ReservedFourteen
+      - ShoreChargerNContControl
+      - ShoreChargerPContControl
+      - ReservedFifteen
+      - ReservedSixteen
+      - PrechargeGeneratorControl
+      - PrechargeMotorControl
+      - PrechargeTaxiControl
+      - PrechargeShoreChargerControl
+      - InterterKeySwitch
+      - InverterPulseEnableInput
+
+- enum:
+    name: PcduEngineFaultBitFields
+    type: uint8_t
+    list:
+      - LossOfCommunicationEngine
+      - LossOfCommunicationInverter
+      - Reserved2
+      - EngineOverspeed
+      - Reserved4
+      - SafingRequest
+      - Reserved6
+      - LossOfEnginePower
+      - InverterFault
+      - EStopDetected
+      - Reserved10
+      - Reserved11
+
+- enum:
+    name: PcduEngineWarningBitFields
+    type: uint8_t
+    list:
+      - HighBatteryVoltageDelta
+      - HighBatteryStateOfChargeDelta
+      - FrontBatteryInactive
+      - RearBatteryInactive
+      - LossOfCommunicationFrontBattery
+      - LossOfCommunicationRearBattery
+      - LossOfCommunicationFuelLevelSensor
+      - Reserved7
+
+- enum:
+    name: PcduDerateReasonBitFields
+    type: uint8_t
+    list:
+      - CellHighTemperature
+      - CellMaxVoltage
+      - CellMinVoltage
+      - Reserved3
+      - GeneratorRotorTemperature
+      - InverterIGBTTemperature
+      - Reserved6
+      - Reserved7
+
+- enum:
+    name: PcduBatteryFaultBitFields
+    type: uint8_t
+    list:
+      - BatteryIsolationLeakageFaultPackOne
+      - BMSCommunicationFaultPackOne
+      - PrechargeFaultPackOne
+      - ExternalVoltageHighPackOne
+      - HighStringImbalancePackOne
+      - FailedThermistorPackOne
+      - MsdHvilPackOne
+      - PrechargeShortedPackOne
+      - CellVoltageHighFaultPackOne
+      - CellVoltageLowFaultPackOne
+      - HighTemperatureFaultPackOne
+      - LowTemperatureFaultPackOne
+      - PackVoltageHighFaultPackOne
+      - PackVoltageLowFaultPackOne
+      - HighPackDischargeCurrentFaultPackOne
+      - HighPackChargeCurrentFaultPackOne
+      - ContactorOpenImminentFaultPackOne
+      - HighPrechargeResistorTempPackOne
+      - BmsHvilPackOne
+      - IncorrectNumberOfMonitorBoardsPackOne
+      - IncompatibleMonitorFirmwarePackOne
+      - LossOfAllMonitorCommunicationPackOne
+      - SumOfCellsVoltageLowPackOne
+      - UnexpectedMonitorAddressPackOne
+      - BatteryIsolationLeakageFaultPackTwo
+      - BMSSystemCommunicationFaultPackTwo
+      - PrechargeFaultPackTwo
+      - ExternalVoltageHighPackTwo
+      - HighStringImbalancePackTwo
+      - FailedThermistorPackTwo
+      - MsdHvilPackTwo
+      - PrechargeShortedPackTwo
+      - CellVoltageHighFaultPackTwo
+      - CellVoltageLowFaultPackTwo
+      - HighTemperatureFaultPackTwo
+      - LowTemperatureFaultPackTwo
+      - PackVoltageHighFaultPackTwo
+      - PackVoltageLowFaultPackTwo
+      - HighPackDischargeCurrentFaultPackTwo
+      - HighPackChargeCurrentFaultPackTwo
+      - ContactorOpenImminentFaultPackTwo
+      - HighPrechargeResistorTempPackTwo
+      - BmsHvilPackTwo
+      - IncorrectNumberOfMonitorBoardsPackTwo
+      - IncompatibleMonitorFirmwarePackTwo
+      - LossOfAllMonitorCommunicationPackTwo
+      - SumOfCellsVoltageLowPackTwo
+      - UnexpectedMonitorAddressPackTwo
+      - PackToSumCellVoltageDeltaHighPackOne
+      - IsolatedAdcCommunicationErrorPackOne
+      - StringPrechargeTimeoutFaultPackOne
+      - StringPrechargeShortedFaultPackOne
+      - StringHighPrechargeResistorTempPackOne
+      - StringHighCurrentImbalancePackOne
+      - MissingMonitorBoardsPackOne
+      - HighStringBalancingCurrentPackOne
+      - PackToSumCellVoltageDeltaHighPackTwo
+      - IsolatedAdcCommunicationErrorPackTwo
+      - StringPrechargeTimeoutFaultPackTwo
+      - StringPrechargeShortedFaultPackTwo
+      - StringHighPrechargeResistorTempPackTwo
+      - StringHighCurrentImbalancePackTwo
+      - MissingMonitorBoardsPackTwo
+      - HighStringBalancingCurrentPackTwo
+
+- enum:
+    name: PcduBatteryWarningBitFields
+    type: uint8_t
+    list:
+      - CellVoltageHighPackOne
+      - CellVoltageLowPackOne
+      - HighTempPackOne
+      - LowTempPackOne
+      - PackVoltageHighPackOne
+      - PackVoltageLowPackOne
+      - HighPackDischargeCurrentPackOne
+      - HighPackChargeCurrentPackOne
+      - IsolatedAdcCommunicationErrorPackOne
+      - DischargeEnvelopeFaultPackOne
+      - ChargeEnvelopeFaultPackOne
+      - ExternalVoltageHighFaultPackOne
+      - PackToSumCellVoltageDeltaHighPackOne
+      - BmsHvilFaultPackOne
+      - HighPrechargeResistorTempPackOne
+      - StringHighPrechargeResistorTempPackOne
+      - PrechargeTimeoutPackOne
+      - PrechargeShortedFaultPackOne
+      - BmsCommunicationFaultPackOne
+      - IsolationLeakageFaultPackOne
+      - FailedThermistorFaultPackOne
+      - BatteryHvilFaultPackOne
+      - StringPrechargeTimeoutFaultPackOne
+      - StringPrechargeShortedFaultPackOne
+      - CellVoltageHighPackTwo
+      - CellVoltageLowPackTwo
+      - HighTempPackTwo
+      - LowTempPackTwo
+      - PackVoltageHighPackTwo
+      - PackVoltageLowPackTwo
+      - HighPackDischargeCurrentPackTwo
+      - HighPackChargeCurrentPackTwo
+      - IsolatedAdcCommunicationErrorPackTwo
+      - DischargeEnvelopeFaultPackTwo
+      - ChargeEnvelopeFaultPackTwo
+      - ExternalVoltageHighFaultPackTwo
+      - PackToSumCellVoltageDeltaHighPackTwo
+      - BmsHvilFaultPackTwo
+      - HighPrechargeResistorTempPackTwo
+      - StringHighPrechargeResistorTempPackTwo
+      - PrechargeTimeoutPackTwo
+      - PrechargeShortedFaultPackTwo
+      - BmsCommunicationFaultPackTwo
+      - IsolationLeakageFaultPackTwo
+      - FailedThermistorFaultPackTwo
+      - BatteryHvilFaultPackTwo
+      - StringPrechargeTimeoutFaultPackTwo
+      - StringPrechargeShortedFaultPackTwo
+      - StringHighImbalancePackOne
+      - SumOfCellsVoltagePackOne
+      - StringHighCurrentImbalancePackOne
+      - Cab500SensorErrorPackOne
+      - StringHighBalancingCurrentWarningPackOne
+      - Reserved53
+      - Reserved54
+      - Reserved55
+      - StringHighImbalancePackTwo
+      - SumOfCellsVoltagePackTwo
+      - StringHighCurrentImbalancePackTwo
+      - Cab500SensorErrorPackTwo
+      - StringHighBalancingCurrentWarningPackTwo
+      - Reserved61
+      - Reserved62
+      - Reserved63
+
+- enum:
+    name: PcduBmsModeCommand
+    type: uint8_t
+    list:
+      - GoToSleep
+      - GoToIdle
+      - GoToPrecharge
+      - ClearFaults
+      - StartBalancingSweep
+
+# ----------------------------------- #
+# ECBU
+# ----------------------------------- #
+- enum:
+    name: EcbuCurrentGroup
+    type: uint8_t
+    list:
+      - "Zero"
+      - "One"
+- enum:
+    name: EcbIdentificationBitState
+    type: uint8_t
+    list:
+      - Open
+      - Closed
+- enum:
+    name: EcbGeneralPurposeBitState
+    type: uint8_t
+    list:
+      - "On"
+      - "Off"
+- enum:
+    name: EcbGeneralPurposeSelection
+    type: uint8_t
+    list:
+      - GP0
+      - GP1
+      - GP2
+      - GP3
+- enum:
+    name: EcbStateInfo
+    type: uint8_t
+    list:
+      - AutoOff
+      - AutoOn
+      - TrippedOff
+      - TrippedOn
+      - PulledOff
+      - PulledOn
+      - CollaredOff
+      - CollaredOn
+    brief_list:
+      - "Auto-Off"
+      - "Auto-On"
+      - "Trip-Off"
+      - "Trip-On"
+      - "Pull-Off"
+      - "Pull-On"
+      - "Coll-Off"
+      - "Coll-On"
+    elaboration_list:
+      - "Auto-Off"
+      - "Auto-On"
+      - "Tripped-Off"
+      - "Tripped-On"
+      - "Pulled-Off"
+      - "Pulled-On"
+      - "Collared-Off"
+      - "Collared-On"
+- enum:
+    name: EcbTripCause
+    type: uint8_t
+    list:
+      - "OK"
+      - "Short"
+      - "I2TOver"
+      - "ResvPArc"
+      - "ResvSAarc"
+    brief_list:
+      - "No Trip"
+      - "Short"
+      - "I2T-Overload"
+      - "Resv-PArc"
+      - "Resv-SArc"
+    elaboration_list:
+      - "Not Tripped"
+      - "Short Ciruit Fault"
+      - "I2T Overload Fault"
+      - "Reserved Parallel Arc Fault"
+      - "Reserved Series Arci Fault"
+
+# ----------------------------------- #
+# Debug Log
+# ----------------------------------- #
+- enum:
+    name: DebugLogLevel
+    type: uint8_t
+    list:
+      - Debug
+      - Info
+      - Warn
+      - Error
+      - Fatal
+
+# ----------------------------------- #
+# Load Channel
+# ----------------------------------- #
+- enum:
+    name: LoadChannelFaultBit
+    type: uint8_t
+    list:
+      - MaxVoltage
+      - MinVoltage
+      - OffVoltage
+      - SwitchTemp
+      - SwitchState
+      - HardCurrent
+      - SoftCurrent
+      - ChannelInit
+      - HardwareOverride
+
+- enum:
+    name: LoadControlCommand
+    type: uint8_t
+    list:
+      # quotes on On/Off are required, without gen script will render as boolean False/True
+      - "Off"
+      - "On"
+
+# ----------------------------------- #
+# GNC
+# The following enums are generated via script by GNC and manually copied.
+# Care must be taken to not overwrite manually-added brief and elaboration list additions.
+# ----------------------------------- #
+- enum:
+    name: ArmedStateEnum
+    type: uint8_t
+    list:
+      - Armed
+      - Disarmed
+
+- enum:
+    name: ContingencyActionEnum
+    type: uint8_t
+    list:
+      - NoneState
+      - Monitor
+      - RejectTakeoff
+      - LandWhenSafe
+      - LandImmediately
+      - RcTakeoverImmediately
+      - AutoEland
+
+- enum:
+    name: ContingencyStateEnum
+    type: uint8_t
+    list:
+      - MotorStateUnknown
+      - PrimaryInsFailure
+      - RcLossOfRedundancy
+      - C2LinkLossOfRedundancy
+      - CompleteInsFailure
+      - MotorFault
+      - C2LinkLossOfFunction
+      - RcLossOfFunction
+      - MotorFailure
+
+- enum:
+    name: EtcChannelEnum
+    type: uint8_t
+    list:
+      - NullChannel
+      - IlPitchClosed
+      - IlPitchFeedback
+      - IlPitchBroken
+      - IlRollClosed
+      - IlRollFeedback
+      - IlRollBroken
+      - IlYawClosed
+      - IlYawFeedback
+      - IlYawBroken
+      - IlHeaveClosed
+      - IlHeaveFeedback
+      - IlHeaveBroken
+      - OlHeaveClosed
+      - OlHeaveFeedback
+      - OlHeaveBroken
+      - OlVtolFvelClosed
+      - OlVtolFvelFeedback
+      - OlVtolLvelClosed
+      - OlVtolLvelFeedback
+      - OlVtolFposClosed
+      - OlVtolFposFeedback
+      - OlVtolLposClosed
+      - OlVtolLposFeedback
+      - OlVtolDposClosed
+      - OlVtolDposFeedback
+
+- enum:
+    name: EtcObjectiveStateEnum
+    type: uint8_t
+    list:
+      - Idle
+      - Active
+      - Complete
+      - Erred
+
+- enum:
+    name: FlightModeEnum
+    type: uint8_t
+    list:
+      - Standby
+      - Armed
+      - Preflight
+      - Takeoff
+      - Hover
+      - HoverTaxi
+      - Transition
+      - Cruise
+      - Land
+      - EmergencyLand
+      - RcAttHdOtControl
+
+- enum:
+    name: GroundDetectorEnum
+    type: uint8_t
+    list:
+      - NearGround
+      - NotNearGround
+      - OnGround
+      - Error
+
+- enum:
+    name: MissionItemObjectiveStateEnum
+    type: uint8_t
+    list:
+      - NullState
+      - InProgress
+      - Complete
+      - Error
+
+- enum:
+    name: MissionStateEnum
+    type: uint8_t
+    list:
+      - NoMission
+      - Accepted
+      - InProgress
+      - Complete
+      - Error
+
+- enum:
+    name: MissionTypeEnum
+    type: uint8_t
+    list:
+      - NoMission
+      - Nominal
+      - EmergencyLand
+
+- enum:
+    name: ModeControllerEnum
+    type: uint8_t
+    list:
+      - FlightControls
+      - Actuators
+      - Hv
+      - Powerplant
+      - Taxi
+      - Cargo
+      - FlightComputerManagement
+      - Sensors
+      - AvionicsPower
+      - Communications
+      - Lighting
+      - VehicleModeManager
+    brief_list:
+      - "Flight Controls"
+      - "Actuators"
+      - "High Voltage"
+      - "Powerplant"
+      - "Taxi"
+      - "Cargo"
+      - "Flight Computers"
+      - "Sensors"
+      - "Avionics Power"
+      - "Communications"
+      - "Lighting"
+      - "Vehicle Mode"
+    elaboration_list:
+      - "Flight Controls"
+      - "Actuators"
+      - "High Voltage"
+      - "Powerplant"
+      - "Taxi"
+      - "Cargo"
+      - "Flight Computer Management"
+      - "Sensors"
+      - "Avionics Power"
+      - "Communications"
+      - "Lighting"
+      - "Vehicle Mode Manager"
+
+- enum:
+    name: ModeEnum
+    type: uint8_t
+    list:
+      - FlightControlsStandby
+      - FlightControlsPreflight
+      - FlightControlsOnMissionIdle
+      - FlightControlsOnMissionTakeoff
+      - FlightControlsOnMissionHover
+      - FlightControlsOnMissionHoverTaxi
+      - FlightControlsOnMissionTransition
+      - FlightControlsOnMissionCruise
+      - FlightControlsOnMissionLand
+      - FlightControlsExternalControlRc
+      - FlightControlsEmergency
+      - FlightControlsTerminate
+      - ActuatorsSafe
+      - ActuatorsActiveServoOnly
+      - ActuatorsActiveServoAndPropulsion
+      - ActuatorsShutdown
+      - ActuatorsTerminate
+      - HvSafe
+      - HvActiveBatteryOnly
+      - HvActiveBatteryPlusTaxi
+      - HvActiveBatteryPlusPropulsion
+      - HvTerminate
+      - PowerplantSafe
+      - PowerplantStart
+      - PowerplantIdle
+      - PowerplantPreGenerating
+      - PowerplantGenerating
+      - PowerplantTerminate
+      - TaxiSafe
+      - TaxiBrakeRelease
+      - TaxiActive
+      - TaxiTerminate
+      - CargoSafe
+      - CargoWinchRelease
+      - CargoActive
+      - CargoFlight
+      - CargoTerminate
+      - FlightComputerManagementBuiltInTest
+      - FlightComputerManagementActive
+      - FlightComputerManagementConfig
+      - SensorsStandby
+      - SensorsGroundOps
+      - SensorsFlightOps
+      - AvionicsPowerActive
+      - AvionicsPowerLowPower
+      - AvionicsPowerTerminate
+      - CommunicationsStandby
+      - CommunicationsActive
+      - LightingStandby
+      - LightingGroundOps
+      - LightingFlightOps
+      - LightingTerminate
+      - VehicleModeSafe
+      - VehicleModeConfig
+      - VehicleModeShoreRecharge
+      - VehicleModeEngineOps
+      - VehicleModeFlightOps
+      - VehicleModeGroundOps
+      - VehicleModeTerminate
+      - NoneState
+
+- enum:
+    name: ModeTransitionRequestResult
+    type: uint8_t
+    list:
+      - Succeeded
+      - Processing
+      - FailedInvalidTransition
+      - FailedTimeout
+      - FailedGeneric
+    brief_list:
+      - "Succeeded"
+      - "Processing"
+      - "Inv Transition"
+      - "Timeout"
+      - "Generic Failure"
+    elaboration_list:
+      - "Succeeded"
+      - "Processing"
+      - "Failed - Invalid Transition"
+      - "Failed - Timeout"
+      - "Failed - Generic"
+
+- enum:
+    name: PhaseOfFlightEnum
+    type: uint8_t
+    list:
+      - Ground
+      - Rotorborne
+      - ForwardTransition
+      - BackwardTransition
+      - Wingborne
+
+- enum:
+    name: SaturationMode
+    type: uint8_t
+    list:
+      - Normal
+      - Low
+      - High
+
+- enum:
+    name: SystemHealthEnum
+    type: uint8_t
+    list:
+      - Normal
+      - Advisory
+      - Caution
+      - Warning
+
+- enum:
+    name: VehicleHealthEnum
+    type: uint8_t
+    list:
+      - Healthy
+      - Advisory
+      - Caution
+      - Warning
+      - WarningEland
+
+- enum:
+    name: VotingModeEnum
+    type: uint8_t
+    list:
+      - Normal
+      - LossOfRedundancy
+      - LossOfFunction
+
+- enum:
+    name: ThrusterRateLimiterModeEnum
+    type: uint8_t
+    list:
+      - AlwaysLimit
+      - LimitDynamic
+      - NoLimit # ECM has an issue with 'Off' as a keyword
+
+- enum:
+    name: MagicallCommsLossActionEnum
+    type: uint8_t
+    list:
+      - Shutdown
+      - LastCommand
+      - PreSetValue

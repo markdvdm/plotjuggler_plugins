@@ -1,0 +1,23 @@
+default_project: "FS"
+default_issue_type: "Bug"
+warn_on_status:
+  - "Merged"
+  - "Cancelled"
+
+excluded_paths:
+  - ".git/**/*"
+  - ".gitmodules"
+  - ".idea/**/*"
+  - ".vscode/**/*"
+  - ".venv/**/*"
+  - "venv/**/*"
+  - ".mypy_cache/**/*"
+  - "extern/**/*"
+
+trusted_paths:
+  - ".github/workflows/**/*"
+
+aliases:
+  "[tests]": "FS-1314"
+  "[convenience]": "FS-1316"
+  "[maintain]": "FS-1489"

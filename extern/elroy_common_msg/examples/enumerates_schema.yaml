@@ -1,0 +1,91 @@
+---
+# common enumerates schema.
+# 
+# Pretty standard generated enumerates. To note:
+#   1. generated enum `type` is calculated based on the number
+#      of entries. If the optional field `type` is included in
+#      the schema, the user-entered-value will be checked
+#      against the the number of entries
+#   2. BusObjectId enum is generated per the number of entries
+#      in bus_object_schema.yaml. This is the only enumerate
+#      generated into `enumerates/` that is not defined in 
+#      this file 
+# 
+# Information on the set of available settings are as folows:
+#
+# - enum: 
+#    name : NameofEnum (Required)
+#    type : fixed-width integer (u/int[8,16,32,64]_t, Optional)
+#    list :            (Required. yaml list syntax)
+#      - SomeEnum (At least 1 required, no numerals allowed) 
+#      - AnotherEnum
+#
+#    # meta data that is added by elroy_common_msg_generator.py.
+#    # included here for the curious typer
+#    metadata :
+#      file :
+#        name : None       # name of file, no extension
+#        path : None       # aboslute path of the file, no extension
+#        header : 
+#          extension: ".h"
+#          include_guard:  # header file include guard 
+#          includes :      # list of header include files: parent classes, enums, etc
+#            - None
+#            - None
+- enum:
+    name: FlightComputerIdentitiy
+    namespace: example_namespace
+    list: 
+      - MainFlightComputer_A
+      - MainFlightComputer_B
+      - MainFlightComputer_C
+      - PortFlightComputer_A
+      - PortFlightComputer_B
+      - StbdFlightComputer_A
+      - StbdFlightComputer_B
+      - TailFlightComputer_A
+      - TailFlightComputer_B
+- enum:
+    name: SystemComponentIdentity
+    list:
+      - Gnc
+      - AirDataComputer
+      - RadarAltimeter
+      - FogIns
+      - MemsIns
+      - Rc_Port
+      - Rc_Stbd
+      - VlMotor_1
+      - VlMotor_2
+      - VlMotor_3
+      - VlMotor_4
+      - VlMotor_5
+      - VlMotor_6
+      - VlMotor_7
+      - VlMotor_8
+      - FpMotor_1
+      - FpMotor_2
+      - FpMotor_3
+      - FpMotor_4
+      - Cs_1
+      - Cs_2
+      - Cs_3
+      - Cs_4
+      - Cs_5
+      - Cs_6
+      - Cs_7
+      - Cs_8
+      - Cs_9
+      - Cs_10
+      - Cs_11
+      - DataLogger
+      - DataLoggerReceiver
+- enum:
+    name: TaskIdentity
+    list: 
+      - Actuators
+      - Autopilot
+      - DataLogger
+      - Feedback
+      - GcsCommand
+      - Sensors
