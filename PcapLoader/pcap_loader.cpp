@@ -57,10 +57,11 @@ bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
   // We need to record pointers to each plot
   std::map<QString, PlotData*> plots_map;
 
+  std::unordered_map<std::string, std::vector<std::variant<std::string, double, bool>>> map_of_vec;
   while (reader.getNextPacket(raw_packet)){
     size_t current_index = 0;
     i++;
-    std::cout << "Parsing packet " << i << std::endl;
+    // std::cout << "Parsing packet " << i << std::endl;
     pcpp::Packet parsed_packet(&raw_packet);
     const auto& ipv4_layer = parsed_packet.getLayerOfType<pcpp::IPv4Layer>();
     const auto& udp_layer = parsed_packet.getLayerOfType<pcpp::UdpLayer>();
@@ -71,19 +72,24 @@ bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
       std::unordered_map<std::string, std::variant<std::string, double, bool>> map;
       elroy_common_msg::MessageDecoderResult res;
       std::string delim = "/";
+
+      if (!decoder.DecodeAsMapOfArrays(byte_array + current_index , byte_array_len, bytes_processed, map_of_vec, res, delim))
+        break;
+      current_index += bytes_processed;
+      continue;
+      //decode as map without going to plotjuggler: 4.1s
+      //decode as map of arrays without going to plotjuggler: 0.11s
       if (!decoder.DecodeAsMap(byte_array + current_index , byte_array_len, bytes_processed, map, res, delim))
         break;
       current_index += bytes_processed;
-      // std::cout << "Byte array len:" << byte_array_len << std::endl;
-      // std::cout << "Bytes processed: " << current_index << std::endl;
       if(map.size() > 0){
         // std::cout << "parsing packet " << i << std::endl;
         for (const auto& pair: map){
           // std::cout << pair.first << std::endl;
           QString field_name = QString::fromStdString(pair.first);
-          if (pair.first.find("VlThrusterState") != std::string::npos){
-            std::cout << pair.first << std::endl;
-          }
+          // if (pair.first.find("VlThrusterState") != std::string::npos){
+          //   std::cout << pair.first << std::endl;
+          // }
 
           // Add a new column to the plotter if it does not already exist
           if (plots_map.find(field_name) == plots_map.end()){
@@ -106,6 +112,34 @@ bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
       }
     }
   }
+
+  // Now that the map of vectors has been populated, for each key in that map copy the vector to plotjuggler
+  if(map_of_vec.size() > 0 && false){
+    for (const auto& pair: map_of_vec){
+      QString field_name = QString::fromStdString(pair.first);
+      if(pair.second.size() == 0)
+        continue;
+      // Add this field name to plotjuggler if it doesn't exist
+      if (plots_map.find(field_name) == plots_map.end()){
+        auto it = plot_data.addNumeric(pair.first);
+        plots_map[field_name] = (&(it->second));
+      }
+      for(const auto& value : pair.second){
+        if(std::holds_alternative<double>(value)){
+            // std::cout << std::get<double>(pair.second) << std::endl;
+            // Get the timestamp from the udp packet. I might need to use the udp layer
+            PlotData::Point point(i, std::get<double>(value));
+            plots_map[field_name]->pushBack(point);
+          }else if(std::holds_alternative<std::string>(value)){
+            // std::cout << std::get<std::string>(pair.second) << std::endl;
+            continue;
+          }
+      }
+    }
+  }else{
+    std::cout << "map of vec is empty" << std::endl;
+  }
+
   // for each msg in the pcap file, call the ecm parser
   // for each message type I need to get the data from it to add to the destination
   //   Can I iterate over an object as if it were a dict? No, C++ does not have reflection
