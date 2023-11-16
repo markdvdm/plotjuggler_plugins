@@ -58,40 +58,52 @@ bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
   std::map<QString, PlotData*> plots_map;
 
   while (reader.getNextPacket(raw_packet)){
+    size_t current_index = 0;
     i++;
+    std::cout << "Parsing packet " << i << std::endl;
     pcpp::Packet parsed_packet(&raw_packet);
     const auto& ipv4_layer = parsed_packet.getLayerOfType<pcpp::IPv4Layer>();
     const auto& udp_layer = parsed_packet.getLayerOfType<pcpp::UdpLayer>();
     const auto& byte_array = udp_layer->getLayerPayload();
     size_t byte_array_len = udp_layer->getLayerPayloadSize();
     size_t bytes_processed = 0;
-    std::unordered_map<std::string, std::variant<std::string, double, bool>> map;
-    elroy_common_msg::MessageDecoderResult res;
-    std::string delim = "/";
-    decoder.DecodeAsMap(byte_array, byte_array_len, bytes_processed, map, res, delim);
-    if(map.size() > 0){
-      // std::cout << "parsing packet " << i << std::endl;
-      for (const auto& pair: map){
-        QString field_name = QString::fromStdString(pair.first);
+    while (current_index < byte_array_len){
+      std::unordered_map<std::string, std::variant<std::string, double, bool>> map;
+      elroy_common_msg::MessageDecoderResult res;
+      std::string delim = "/";
+      if (!decoder.DecodeAsMap(byte_array + current_index , byte_array_len, bytes_processed, map, res, delim))
+        break;
+      current_index += bytes_processed;
+      // std::cout << "Byte array len:" << byte_array_len << std::endl;
+      // std::cout << "Bytes processed: " << current_index << std::endl;
+      if(map.size() > 0){
+        // std::cout << "parsing packet " << i << std::endl;
+        for (const auto& pair: map){
+          // std::cout << pair.first << std::endl;
+          QString field_name = QString::fromStdString(pair.first);
+          if (pair.first.find("VlThrusterState") != std::string::npos){
+            std::cout << pair.first << std::endl;
+          }
 
-        // Add a new column to the plotter if it does not already exist
-        if (plots_map.find(field_name) == plots_map.end()){
-          auto it = plot_data.addNumeric(pair.first);
-          plots_map[field_name] = (&(it->second));
-        }
+          // Add a new column to the plotter if it does not already exist
+          if (plots_map.find(field_name) == plots_map.end()){
+            auto it = plot_data.addNumeric(pair.first);
+            plots_map[field_name] = (&(it->second));
+          }
 
-        // std::cout << pair.first << std::endl;
-        if(std::holds_alternative<double>(pair.second)){
-          // std::cout << std::get<double>(pair.second) << std::endl;
-          PlotData::Point point(i, std::get<double>(pair.second));
-          plots_map[field_name]->pushBack(point);
-        }else if(std::holds_alternative<std::string>(pair.second)){
-          // std::cout << std::get<std::string>(pair.second) << std::endl;
-          continue;
+          // std::cout << pair.first << std::endl;
+          if(std::holds_alternative<double>(pair.second)){
+            // std::cout << std::get<double>(pair.second) << std::endl;
+            // Get the timestamp from the udp packet. I might need to use the udp layer
+            PlotData::Point point(i, std::get<double>(pair.second));
+            plots_map[field_name]->pushBack(point);
+          }else if(std::holds_alternative<std::string>(pair.second)){
+            // std::cout << std::get<std::string>(pair.second) << std::endl;
+            continue;
+          }
         }
+        // break;
       }
-      // break;
-
     }
   }
   // for each msg in the pcap file, call the ecm parser
