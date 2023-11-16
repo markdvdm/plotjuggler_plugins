@@ -1,0 +1,3 @@
+[submodule "extern/elroy_common_msg"]
+	path = extern/elroy_common_msg
+	url = git@github.com:elroyair/elroy_common_msg.git
