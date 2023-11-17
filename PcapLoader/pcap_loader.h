@@ -30,11 +30,16 @@ public:
   virtual const std::vector<const char*>& compatibleFileExtensions() const override{
     return _extensions;
   };
+  std::vector<std::unordered_map<std::string, std::variant<std::string, double, bool>>> ParseOnePacketToMap(pcpp::RawPacket &packet, const std::string &delim = "/")const;
   std::unordered_map<std::string, std::vector<std::variant<std::string, double, bool>>> ProcessPackets(std::vector<pcpp::RawPacket> &vec, size_t start_idx, size_t end_idx) const;
   bool readDataFromFile(PJ::FileLoadInfo* fileload_info,
                         PlotDataMapRef& destination) override;
   bool readDataFromFile_mulithread(PJ::FileLoadInfo* fileload_info,
                         PlotDataMapRef& destination);
+  bool readDataFromFile_mulithread_old(PJ::FileLoadInfo* fileload_info,
+                        PlotDataMapRef& destination);
+  bool readDataFromFile_transform(PJ::FileLoadInfo* fileload_info,
+                        PlotDataMapRef& destination);                      
 
   ~PcapLoader() override = default;
 
