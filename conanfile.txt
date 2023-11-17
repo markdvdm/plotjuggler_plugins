@@ -1,6 +1,7 @@
 [requires]
 gtest/1.12.1
 pcapplusplus/22.11
+sqlite3/3.37.2
 
 [generators]
 cmake_find_package

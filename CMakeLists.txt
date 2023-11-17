@@ -19,7 +19,7 @@ find_package(Qt5 REQUIRED COMPONENTS
     OpenGL)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}")
 find_package(pcapplusplus REQUIRED)
-#find_package(Valgrind REQUIRED)
+#find_package(sqlite3 REQUIRED)
 #find_package(cachegrind REQUIRED)
 
 include_directories(
@@ -84,13 +84,6 @@ endif()
 
 #------- Create the libraries -------
 
-#add_library(ElroyParser SHARED
-#    ElroyParser/elroy_parser_plugin.h
-#    ElroyParser/elroy_parser_plugin.cpp )
-
-#target_link_libraries(ElroyParser
-#    ${PJ_LIBRARIES})
-
 set(ECM_INCLUDES ${CMAKE_SOURCE_DIR}/extern/elroy_common_msg/generated/cpp/include
                  ${CMAKE_SOURCE_DIR}/extern/elroy_common_msg/private
 )
@@ -116,13 +109,31 @@ target_link_libraries(PcapLoaderExec
   pcapplusplus::pcapplusplus
 ) 
 
+add_library(ElroyLogLoader SHARED
+    ElroyLogLoader/elroy_log_loader.h 
+    ElroyLogLoader/elroy_log_loader.cpp )
+target_include_directories(
+  ElroyLogLoader PRIVATE ${PROJECT_SOURCE_DIR}/include ${ECM_INCLUDES}
+)
+target_link_libraries(ElroyLogLoader
+    PcapLoader
+    sqlite3
+    ${PJ_LIBRARIES}
+    pcapplusplus::pcapplusplus
+)
+add_executable(ElroyLogLoaderExec ElroyLogLoader/elroy_log_loader.cpp)
+target_include_directories(
+  ElroyLogLoaderExec PRIVATE ${PROJECT_SOURCE_DIR}/include ${ECM_INCLUDES}
+)
+target_link_libraries(ElroyLogLoaderExec 
+  ElroyLogLoader
+  ${PJ_LIBRARIES}
+  pcapplusplus::pcapplusplus
+) 
+
 #target_include_directories(
 #  PcapLoader
 #  PRIVATE pcapplusplus::pcapplusplus ${PROJECT_SOURCE_DIR}/include)
-
-#add_library(PlotjugglerEl2Loader SHARED
-#   El2Loader/dataload_el2.h
-#   El2Loader/dataload_el2.cpp )
 
 #target_link_libraries(PlotjugglerEl2Loader
 #    ${PJ_LIBRARIES})
@@ -130,6 +141,7 @@ target_link_libraries(PcapLoaderExec
 if (COMPILING_WITH_AMENT)
     #ament_target_dependencies(ElroyParser plotjuggler)
     ament_target_dependencies(PcapLoader plotjuggler)
+    ament_target_dependencies(ElroyLogLoader plotjuggler)
     #ament_target_dependencies(PlotjugglerEl2Loader plotjuggler)
 endif()
 #------- Install the libraries -------
@@ -139,6 +151,8 @@ install(
         #ElroyParser
         PcapLoader
         PcapLoaderExec
+        ElroyLogLoader
+        ElroyLogLoaderExec
         # PlotjugglerEl2Loader
     DESTINATION
         ${PJ_PLUGIN_INSTALL_DIRECTORY}  )
