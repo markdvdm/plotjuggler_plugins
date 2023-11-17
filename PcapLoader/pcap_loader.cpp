@@ -13,6 +13,8 @@
 #include <QProgressDialog>
 #include <QDateTime>
 #include <QInputDialog>
+#include <thread>
+#include <algorithm>
 // #include <valgrind/callgrind.h>
 
 
@@ -31,9 +33,115 @@ std::vector<std::reference_wrapper<const std::type_info>> numericTypes = {
 PcapLoader::PcapLoader(){
     _extensions.push_back("pcap");
 }
+std::unordered_map<std::string, std::vector<std::variant<std::string, double, bool>>> PcapLoader::ProcessPackets(std::vector<pcpp::RawPacket> &vec, size_t start_idx, size_t end_idx)const{
+  std::unordered_map<std::string, std::vector<std::variant<std::string, double, bool>>> map_of_vec;
+  elroy_common_msg::MsgDecoder decoder;
+  for (size_t i = start_idx; i < end_idx; ++i){
+    size_t current_index = 0;
+    pcpp::Packet parsed_packet(&vec[i]);
+    const auto& ipv4_layer = parsed_packet.getLayerOfType<pcpp::IPv4Layer>();
+    const auto& udp_layer = parsed_packet.getLayerOfType<pcpp::UdpLayer>();
+    const auto& byte_array = udp_layer->getLayerPayload();
+    size_t byte_array_len = udp_layer->getLayerPayloadSize();
+    size_t bytes_processed = 0;
+    std::string delim = "/";
+    elroy_common_msg::MessageDecoderResult res;
+    while (current_index < byte_array_len){
+      if (!decoder.DecodeAsMapOfArrays(byte_array + current_index , byte_array_len-current_index, bytes_processed, map_of_vec, res, delim))
+        break;
+      current_index += bytes_processed;
+    }
+  }
+  return map_of_vec;
+}
+bool PcapLoader::readDataFromFile_mulithread(PJ::FileLoadInfo* fileload_info, PlotDataMapRef& plot_data){
+  auto startTime = std::chrono::high_resolution_clock::now();
+  int numThreads = 8;
+  std::vector<pcpp::RawPacket> packet_data;
+  std::vector<std::unordered_map<std::string, std::vector<std::variant<std::string, double, bool>>>> vec_of_map_of_vec(numThreads);
 
+  // Load the pcap file
+  const auto& path = fileload_info->filename.toStdString();
+  std::cout <<"File name: " <<  path << std::endl;
+  // const bool file_exists = access(fileload_info->filename, 0) == 0;
+  pcpp::PcapFileReaderDevice reader(path);
+  if (!reader.open()) {
+    std::string m = "Could not open pcap file: {}"+ path;
+    throw std::runtime_error(m);
+  }
+  pcpp::RawPacket raw_packet;
+  while (reader.getNextPacket(raw_packet)){
+    packet_data.push_back(raw_packet);
+  }
+  std::vector<std::thread> threads;
+  const size_t chunkSize = packet_data.size() / numThreads;
+  for (size_t i = 0; i < numThreads; ++i) {
+    size_t startIndex = i * chunkSize;
+    size_t endIndex = (i == numThreads - 1) ? packet_data.size() : (i + 1) * chunkSize;
+    threads.emplace_back([this, &packet_data, &vec_of_map_of_vec, i, startIndex, endIndex](){
+      vec_of_map_of_vec[i] = this->ProcessPackets(packet_data, startIndex, endIndex);
+    });
+  }
+  // Wait for all threads to finish
+  for (auto& thread : threads) {
+      thread.join();
+  }
+  // Join together the maps of arrays
+  std::unordered_map<std::string, std::vector<std::variant<std::string, double, bool>>> map_of_vecs;
+  for (const auto& map : vec_of_map_of_vec){
+    for (const auto& key_val : map){
+      const auto& key = key_val.first;
+      map_of_vecs.insert({key, {}});
+      map_of_vecs[key].insert(map_of_vecs[key].end(), key_val.second.begin(), key_val.second.end());
+      continue;
+    }
+  }
+
+  // Now that the map of vectors has been populated, for each key in that map copy the vector to plotjuggler
+
+  // We need to record pointers to each plot
+  std::map<QString, PlotData*> plots_map;
+  std::map<QString, PJ::StringSeries*> string_map;
+  if(map_of_vecs.size() > 0 && true){
+    for (const auto& pair: map_of_vecs){
+      QString field_name = QString::fromStdString(pair.first);
+      if(pair.second.size() == 0)
+        continue;
+      // Add this field name to plotjuggler if it doesn't exist
+      if (std::holds_alternative<double>(pair.second[0]) && plots_map.find(field_name) == plots_map.end()){
+        auto it = plot_data.addNumeric(pair.first);
+        plots_map[field_name] = (&(it->second));
+      }
+      else if (std::holds_alternative<std::string>(pair.second[0]) && plots_map.find(field_name) == plots_map.end()){
+        auto it = plot_data.addStringSeries(pair.first);
+        string_map[field_name] = (&(it->second));
+      }
+      size_t i = 0;
+      for(const auto& value : pair.second){
+        ++i;
+        if(std::holds_alternative<double>(value)){
+            // Get the timestamp from the udp packet. I might need to use the udp layer
+            PlotData::Point point(i, std::get<double>(value));
+            plots_map[field_name]->pushBack(point);
+          }else if(std::holds_alternative<std::string>(value)){
+            // std::cout << std::get<std::string>(pair.second) << std::endl;
+            string_map[field_name]->pushBack({static_cast<double>(i), std::get<std::string>(value)});
+            continue;
+          }
+      }
+    }
+  }else{
+    std::cout << "map of vec is empty" << std::endl;
+  }
+  auto endTime = std::chrono::high_resolution_clock::now();
+  auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
+  std::cout << "Time taken by function: " << duration.count()/1000.0 << " seconds" << std::endl;
+  return true;
+}
 bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
                         PlotDataMapRef& plot_data){
+  return PcapLoader::readDataFromFile_mulithread(fileload_info, plot_data);                        
+
   // CALLGRIND_START_INSTRUMENTATION
   // CALLGRIND_TOGGLE_COLLECT;
   auto startTime = std::chrono::high_resolution_clock::now();

@@ -11,6 +11,12 @@
 #include <QtPlugin>
 #include "PlotJuggler/dataloader_base.h"
 
+
+#include "IPv4Layer.h"
+#include "Packet.h"
+#include "PcapFileDevice.h"
+#include "UdpLayer.h"
+
 using namespace PJ;
 
 class PcapLoader : public DataLoader
@@ -24,9 +30,11 @@ public:
   virtual const std::vector<const char*>& compatibleFileExtensions() const override{
     return _extensions;
   };
-
+  std::unordered_map<std::string, std::vector<std::variant<std::string, double, bool>>> ProcessPackets(std::vector<pcpp::RawPacket> &vec, size_t start_idx, size_t end_idx) const;
   bool readDataFromFile(PJ::FileLoadInfo* fileload_info,
                         PlotDataMapRef& destination) override;
+  bool readDataFromFile_mulithread(PJ::FileLoadInfo* fileload_info,
+                        PlotDataMapRef& destination);
 
   ~PcapLoader() override = default;
 
