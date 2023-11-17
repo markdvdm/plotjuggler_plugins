@@ -19,6 +19,8 @@ find_package(Qt5 REQUIRED COMPONENTS
     OpenGL)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_BINARY_DIR}")
 find_package(pcapplusplus REQUIRED)
+#find_package(Valgrind REQUIRED)
+#find_package(cachegrind REQUIRED)
 
 include_directories(
     ${Qt5Core_INCLUDE_DIRS}
@@ -104,6 +106,16 @@ target_link_libraries(PcapLoader
     pcapplusplus::pcapplusplus
 )
 
+add_executable(PcapLoaderExec PcapLoader/pcap_loader.cpp)
+target_include_directories(
+  PcapLoaderExec PRIVATE ${PROJECT_SOURCE_DIR}/include ${ECM_INCLUDES}
+)
+target_link_libraries(PcapLoaderExec 
+  PcapLoader    
+  ${PJ_LIBRARIES}
+  pcapplusplus::pcapplusplus
+) 
+
 #target_include_directories(
 #  PcapLoader
 #  PRIVATE pcapplusplus::pcapplusplus ${PROJECT_SOURCE_DIR}/include)
@@ -126,6 +138,7 @@ install(
     TARGETS
         #ElroyParser
         PcapLoader
+        PcapLoaderExec
         # PlotjugglerEl2Loader
     DESTINATION
         ${PJ_PLUGIN_INSTALL_DIRECTORY}  )

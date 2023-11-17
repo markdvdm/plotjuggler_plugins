@@ -13,6 +13,8 @@
 #include <QProgressDialog>
 #include <QDateTime>
 #include <QInputDialog>
+// #include <valgrind/callgrind.h>
+
 
 #include <chrono>
 
@@ -32,6 +34,8 @@ PcapLoader::PcapLoader(){
 
 bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
                         PlotDataMapRef& plot_data){
+  // CALLGRIND_START_INSTRUMENTATION
+  // CALLGRIND_TOGGLE_COLLECT;
   auto startTime = std::chrono::high_resolution_clock::now();
 
   // Load the pcap file
@@ -43,19 +47,17 @@ bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
     std::string m = "Could not open pcap file: {}"+ path;
     throw std::runtime_error(m);
   }
-  // size_t chunk_size = 128 * 1024;
-  // size_t packets_to_load = 1 * chunk_size_;
-  // while (reader_->isOpened()){
-    // pcpp::RawPacketVector raw_packets;
-    // const size_t loaded_amount = reader_->getNextPackets(raw_packets, packets_to_load);
-    // pcpp::RawPacket raw_packet; 
-  // }
   pcpp::RawPacket raw_packet; 
   int i = 0;
   elroy_common_msg::MsgDecoder decoder;
 
   // We need to record pointers to each plot
   std::map<QString, PlotData*> plots_map;
+  std::map<QString, PJ::StringSeries*> string_map;
+
+  // Schema for ip addresses
+  std::map<std::string, std::string> ip_src_addr_to_folder_name;
+  ip_src_addr_to_folder_name["172.16.17.11"] = "MfcA";
 
   std::unordered_map<std::string, std::vector<std::variant<std::string, double, bool>>> map_of_vec;
   while (reader.getNextPacket(raw_packet)){
@@ -73,65 +75,97 @@ bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
       elroy_common_msg::MessageDecoderResult res;
       std::string delim = "/";
 
-      if (!decoder.DecodeAsMapOfArrays(byte_array + current_index , byte_array_len, bytes_processed, map_of_vec, res, delim))
-        break;
-      current_index += bytes_processed;
-      continue;
+      // if (!decoder.DecodeAsMapOfArrays(byte_array + current_index , byte_array_len-current_index, bytes_processed, map_of_vec, res, delim))
+      //   break;
+      // current_index += bytes_processed;
+      // continue;
       //decode as map without going to plotjuggler: 4.1s
       //decode as map of arrays without going to plotjuggler: 0.11s
-      if (!decoder.DecodeAsMap(byte_array + current_index , byte_array_len, bytes_processed, map, res, delim))
+      if (!decoder.DecodeAsMap(byte_array + current_index , byte_array_len-current_index, bytes_processed, map, res, delim))
         break;
       current_index += bytes_processed;
       if(map.size() > 0){
-        // std::cout << "parsing packet " << i << std::endl;
+        // Find the timestamp, in BusObject/write_timestamp_ns
+        double timestamp = 0;
+        std::string timestamp_key = "BusObject" + delim + "write_timestamp_ns";
+        for(auto it = map.begin(); it!= map.end(); ++it){
+          const std::string& key = it->first;
+          if(key.size() > timestamp_key.size() && key.compare(key.size() - timestamp_key.size(), timestamp_key.size(), timestamp_key) == 0 ){
+            timestamp = std::get<double>(map[key]) / 1e9;
+          }
+        }
+        std::string instance_key = "component" + delim + "instance"; //"instance_str";
+        std::string instance_id = "";
+        double instance_component = 0;
+        for(auto it = map.begin(); it!= map.end(); ++it){
+          const std::string& key = it->first;
+          if(key.size() > instance_key.size() && key.compare(key.size() - instance_key.size(), instance_key.size(), instance_key) == 0 ){
+            // instance_id = "_"+  std::get<std::string>(map[key]);
+            instance_id = "_"+  std::to_string(static_cast<size_t>(std::get<double>(map[key])));
+          }
+        }
         for (const auto& pair: map){
-          // std::cout << pair.first << std::endl;
-          QString field_name = QString::fromStdString(pair.first);
+          std::string field_name_str = pair.first;
+          field_name_str = field_name_str.insert(field_name_str.find(delim), "_"+instance_id);
+          // QString field_name = QString::fromStdString(pair.first);
+          QString field_name = QString::fromStdString(field_name_str);
           // if (pair.first.find("VlThrusterState") != std::string::npos){
           //   std::cout << pair.first << std::endl;
           // }
 
           // Add a new column to the plotter if it does not already exist
-          if (plots_map.find(field_name) == plots_map.end()){
-            auto it = plot_data.addNumeric(pair.first);
+          if ((std::holds_alternative<double>(pair.second) || std::holds_alternative<bool>(pair.second)) && plots_map.find(field_name) == plots_map.end()){
+            auto it = plot_data.addNumeric(field_name.toStdString());
             plots_map[field_name] = (&(it->second));
           }
-
+          else if (std::holds_alternative<std::string>(pair.second) && string_map.find(field_name) == string_map.end()){
+            auto it = plot_data.addStringSeries(field_name.toStdString());
+            string_map[field_name] = (&(it->second));
+          }
           // std::cout << pair.first << std::endl;
           if(std::holds_alternative<double>(pair.second)){
             // std::cout << std::get<double>(pair.second) << std::endl;
             // Get the timestamp from the udp packet. I might need to use the udp layer
-            PlotData::Point point(i, std::get<double>(pair.second));
+            PlotData::Point point(timestamp, std::get<double>(pair.second));
             plots_map[field_name]->pushBack(point);
           }else if(std::holds_alternative<std::string>(pair.second)){
             // std::cout << std::get<std::string>(pair.second) << std::endl;
+            string_map[field_name]->pushBack({static_cast<double>(i), std::get<std::string>(pair.second)});
             continue;
           }
         }
         // break;
       }
     }
+    // CALLGRIND_TOGGLE_COLLECT;
+    // CALLGRIND_STOP_INSTRUMENTATION;
   }
 
   // Now that the map of vectors has been populated, for each key in that map copy the vector to plotjuggler
-  if(map_of_vec.size() > 0 && false){
+  if(map_of_vec.size() > 0 && true){
     for (const auto& pair: map_of_vec){
       QString field_name = QString::fromStdString(pair.first);
       if(pair.second.size() == 0)
         continue;
       // Add this field name to plotjuggler if it doesn't exist
-      if (plots_map.find(field_name) == plots_map.end()){
+      if (std::holds_alternative<double>(pair.second[0]) && plots_map.find(field_name) == plots_map.end()){
         auto it = plot_data.addNumeric(pair.first);
         plots_map[field_name] = (&(it->second));
       }
+      else if (std::holds_alternative<std::string>(pair.second[0]) && plots_map.find(field_name) == plots_map.end()){
+        auto it = plot_data.addStringSeries(pair.first);
+        string_map[field_name] = (&(it->second));
+      }
+      size_t i = 0;
       for(const auto& value : pair.second){
+        ++i;
         if(std::holds_alternative<double>(value)){
-            // std::cout << std::get<double>(pair.second) << std::endl;
             // Get the timestamp from the udp packet. I might need to use the udp layer
             PlotData::Point point(i, std::get<double>(value));
             plots_map[field_name]->pushBack(point);
           }else if(std::holds_alternative<std::string>(value)){
             // std::cout << std::get<std::string>(pair.second) << std::endl;
+            string_map[field_name]->pushBack({static_cast<double>(i), std::get<std::string>(value)});
             continue;
           }
       }
@@ -258,3 +292,11 @@ bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
 
 //   return true;
 // }
+int main()
+{
+  PcapLoader pcap;
+  PJ::FileLoadInfo file_info;
+  file_info.filename = QString::fromStdString("/home/mark/code2/fast_ecm_example.pcap");
+  PlotDataMapRef plot_data;
+  pcap.readDataFromFile(&file_info,plot_data);
+}
