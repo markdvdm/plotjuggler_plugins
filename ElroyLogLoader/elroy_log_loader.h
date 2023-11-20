@@ -26,6 +26,8 @@ public:
   };
   bool readDataFromFile(PJ::FileLoadInfo* fileload_info,
                         PlotDataMapRef& destination) override;
+  bool readDataFromFile_multithread(PJ::FileLoadInfo* fileload_info,
+                        PlotDataMapRef& destination);                      
 
   ~ElroyLogLoader() override = default;
 
@@ -39,7 +41,26 @@ protected:
   QSize parseHeader(QFile* file, std::vector<std::string>& ordered_names);
 
 private:
+  using EcmMessageMap = std::unordered_map<std::string, std::variant<std::string, double, bool>>;
+  using EcmMessageListMap = std::unordered_map<std::string, std::vector<std::variant<std::string, double, bool>>>;
+  void WriteToPlotjugglerThreadSafe(const QString& field_name, const std::variant<std::string, double, bool> &data, double timestamp);
+  bool ParseEcmToPlotjuggler(const uint8_t* const buf, size_t buff_len, const std::string& delim = "/");
+  std::vector<EcmMessageMap> ParseToEcmMap(const uint8_t* const buf, size_t buff_len, const std::string& delim = "/");
+
   std::vector<const char*> _extensions;
 
   std::string _default_time_axis;
+
+  // Pointers to plotjuggler plots
+  std::unordered_map<QString, PlotData*> _plots_map;
+  // Pointers pointers to plotjuggler string plots (this only displays the strings in the tree and does not plot them)
+  std::unordered_map<QString, PJ::StringSeries*> _string_map;
+
+  // Mutex for writing to plotjuggler
+  std::mutex _plotjuggler_mutex;
+  PlotDataMapRef* _plot_data;
+  std::mutex _db_mutex;
+
+  size_t _msg_counter = 0;
+  std::mutex _counter_mutex;
 };
