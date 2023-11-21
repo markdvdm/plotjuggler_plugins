@@ -56,13 +56,10 @@ std::unordered_map<std::string, std::vector<std::variant<std::string, double, bo
       current_index += bytes_processed;
     }
   }
-  for (const auto& key_val : map_of_vec){
-    std::cout << key_val.first << std::endl;
-  }
   return map_of_vec;
 }
 std::vector<EcmMessageMap> PcapLoader::ParseOnePacketToMap(pcpp::RawPacket &packet, const std::string &delim)const{
-  elroy_common_msg::MsgDecoder decoder;
+  //elroy_common_msg::MsgDecoder decoder;
   std::vector<EcmMessageMap> maps;
   size_t current_index = 0;
   pcpp::Packet parsed_packet(&packet);
@@ -74,7 +71,7 @@ std::vector<EcmMessageMap> PcapLoader::ParseOnePacketToMap(pcpp::RawPacket &pack
   while (current_index < byte_array_len){
     std::unordered_map<std::string, std::variant<std::string, double, bool>> map;
     elroy_common_msg::MessageDecoderResult res;
-    if (!decoder.DecodeAsMap(byte_array + current_index , byte_array_len-current_index, bytes_processed, map, res, delim)){
+    if (!elroy_common_msg::MsgDecoder::DecodeAsMap(byte_array + current_index , byte_array_len-current_index, bytes_processed, map, res, delim)){
       break;
     }
     current_index += bytes_processed;
@@ -126,8 +123,9 @@ return true;
 }
 
 bool PcapLoader::readDataFromFile_mulithread(PJ::FileLoadInfo* fileload_info, PlotDataMapRef& plot_data){
+  // Warning: This function uses tons of memory!
   auto startTime = std::chrono::high_resolution_clock::now();
-  int numThreads = 8;
+  int numThreads = 1;
   std::string delim = "/";
 
   // Initialize pointers to plotjuggler plots
@@ -152,13 +150,13 @@ bool PcapLoader::readDataFromFile_mulithread(PJ::FileLoadInfo* fileload_info, Pl
   std::vector<std::vector<EcmMessageMap>> vec_of_maps(numThreads);
   const size_t chunkSize = packet_data.size() / numThreads;
   std::vector<std::thread> threads;
-  for (size_t i = 0; i < numThreads; ++i) {
-    size_t startIndex = i * chunkSize;
-    size_t endIndex = (i == numThreads - 1) ? packet_data.size() : (i + 1) * chunkSize;
-    threads.emplace_back([this, &packet_data, &vec_of_maps, i, startIndex, endIndex](){
+  for (size_t thread_idx = 0; thread_idx < numThreads; ++thread_idx) {
+    size_t startIndex = thread_idx * chunkSize;
+    size_t endIndex = (thread_idx == numThreads - 1) ? packet_data.size() : (thread_idx + 1) * chunkSize;
+    threads.emplace_back([this, &packet_data, &vec_of_maps, thread_idx, startIndex, endIndex](){
       for(size_t j = startIndex; j < endIndex; ++j){
         const auto& message_maps = this->ParseOnePacketToMap(packet_data[j]);
-        vec_of_maps[i].insert(vec_of_maps[i].end(), message_maps.begin(), message_maps.end());
+        vec_of_maps[thread_idx].insert(vec_of_maps[thread_idx].end(), message_maps.begin(), message_maps.end());
       }
     });
   }
@@ -258,12 +256,9 @@ bool PcapLoader::readDataFromFile_mulithread_old(PJ::FileLoadInfo* fileload_info
       thread.join();
   }
 
-  // vec_of_map_of_vec[0] = this->ProcessPackets(packet_data, 0, packet_data.size());
-
   // Join together the maps of arrays
   std::unordered_map<std::string, std::vector<std::variant<std::string, double, bool>>> map_of_vecs;
   for (const auto& map : vec_of_map_of_vec){
-    std::cout << "combining one map" << std::endl;
     for (const auto& key_val : map){
       const auto& key = key_val.first;
       map_of_vecs.insert({key, {}});
@@ -319,11 +314,9 @@ bool PcapLoader::readDataFromFile_mulithread_old(PJ::FileLoadInfo* fileload_info
 }
 bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
                         PlotDataMapRef& plot_data){
-  // return PcapLoader::readDataFromFile_mulithread_old(fileload_info, plot_data);                        
-  return PcapLoader::readDataFromFile_mulithread(fileload_info, plot_data);                        
+  return PcapLoader::readDataFromFile_mulithread_old(fileload_info, plot_data);                        
+  // return PcapLoader::readDataFromFile_mulithread(fileload_info, plot_data);                        
 
-  // CALLGRIND_START_INSTRUMENTATION
-  // CALLGRIND_TOGGLE_COLLECT;
   auto startTime = std::chrono::high_resolution_clock::now();
   std::string delim = "/";
 
@@ -344,11 +337,11 @@ bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
   std::map<QString, PlotData*> plots_map;
   std::map<QString, PJ::StringSeries*> string_map;
 
-  // Schema for ip addresses
-  std::map<std::string, std::string> ip_src_addr_to_folder_name;
-  ip_src_addr_to_folder_name["172.16.17.11"] = "MfcA";
-
+  // // Schema for ip addresses
+  // std::map<std::string, std::string> ip_src_addr_to_folder_name;
+  // ip_src_addr_to_folder_name["172.16.17.11"] = "MfcA";
   std::unordered_map<std::string, std::vector<std::variant<std::string, double, bool>>> map_of_vec;
+
   while (reader.getNextPacket(raw_packet)){
     auto maps = ParseOnePacketToMap(raw_packet);
     for (auto& map : maps){
@@ -412,6 +405,7 @@ bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
     const auto& byte_array = udp_layer->getLayerPayload();
     size_t byte_array_len = udp_layer->getLayerPayloadSize();
     size_t bytes_processed = 0;
+
     while (current_index < byte_array_len){
       std::unordered_map<std::string, std::variant<std::string, double, bool>> map;
       elroy_common_msg::MessageDecoderResult res;
@@ -528,112 +522,6 @@ bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
   return true;                         
 }
 
-// #include "dataload_simple_csv.h"
-// #include <QTextStream>
-// #include <QFile>
-// #include <QMessageBox>
-// #include <QDebug>
-// #include <QSettings>
-// #include <QProgressDialog>
-// #include <QDateTime>
-// #include <QInputDialog>
-
-// DataLoadSimpleCSV::DataLoadSimpleCSV()
-// {
-//   _extensions.push_back("pj_csv");
-// }
-
-// const QRegExp csv_separator("(\\,)");
-
-// const std::vector<const char*>& DataLoadSimpleCSV::compatibleFileExtensions() const
-// {
-//   return _extensions;
-// }
-
-// bool DataLoadSimpleCSV::readDataFromFile(FileLoadInfo* info, PlotDataMapRef& plot_data)
-// {
-//   QFile file(info->filename);
-//   if( !file.open(QFile::ReadOnly) )
-//   {
-//     return false;
-//   }
-//   QTextStream text_stream(&file);
-
-//   // The first line should contain the name of the columns
-//   QString first_line = text_stream.readLine();
-//   QStringList column_names = first_line.split(csv_separator);
-
-//   // create a vector of timeseries
-//   std::vector<PlotData*> plots_vector;
-
-//   for (unsigned i = 0; i < column_names.size(); i++)
-//   {
-//     QString column_name = column_names[i].simplified();
-
-//     std::string field_name = column_names[i].toStdString();
-
-//     auto it = plot_data.addNumeric(field_name);
-
-//     plots_vector.push_back(&(it->second));
-//   }
-
-//   //-----------------
-//   // read the file line by line
-//   int linecount = 1;
-//   while (!text_stream.atEnd())
-//   {
-//     QString line = text_stream.readLine();
-//     linecount++;
-
-//     // Split using the comma separator.
-//     QStringList string_items = line.split(csv_separator);
-//     if (string_items.size() != column_names.size())
-//     {
-//       auto err_msg = QString("The number of values at line %1 is %2,\n"
-//                              "but the expected number of columns is %3.\n"
-//                              "Aborting...")
-//           .arg(linecount)
-//           .arg(string_items.size())
-//           .arg(column_names.size());
-
-//       QMessageBox::warning(nullptr, "Error reading file", err_msg );
-//       return false;
-//     }
-
-//     // The first column should contain the timestamp.
-//     QString first_item = string_items[0];
-//     bool is_number;
-//     double t = first_item.toDouble(&is_number);
-
-//     // check if the time format is a DateTime
-//     if (!is_number )
-//     {
-//       QDateTime ts = QDateTime::fromString(string_items[0], "yyyy-MM-dd hh:mm:ss");
-//       if (!ts.isValid())
-//       {
-//           QMessageBox::warning(nullptr, tr("Error reading file"),
-//                   tr("Couldn't parse timestamp. Aborting.\n"));
-
-//           return false;
-//       }
-//       t = ts.toMSecsSinceEpoch()/1000.0;
-//     }
-
-//     for (int i = 0; i < string_items.size(); i++)
-//     {
-//       double y = string_items[i].toDouble(&is_number);
-//       if (is_number)
-//       {
-//         PlotData::Point point(t, y);
-//         plots_vector[i]->pushBack(point);
-//       }
-//     }
-//   }
-
-//   file.close();
-
-//   return true;
-// }
 int main()
 {
   PcapLoader pcap;

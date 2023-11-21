@@ -15,52 +15,6 @@
 
 #include "elroy_common_msg/msg_handling/msg_decoder.h"
 
-class BlobData {
-public:
-    BlobData(const void* data, int size) : size(size) {
-        // Allocate memory and copy the BLOB data
-        if (size > 0) {
-            buffer = new uint8_t[size];
-            std::memcpy(buffer, data, size);
-        }
-    }
-
-    ~BlobData() {
-        // Release allocated memory
-        delete[] buffer;
-    }
-
-    // Accessors
-    const uint8_t* getData() const {
-        return buffer;
-    }
-
-    int getSize() const {
-        return size;
-    }
-
-    // Move constructor
-    BlobData(BlobData&& other) noexcept : buffer(other.buffer), size(other.size) {
-        other.buffer = nullptr;
-        other.size = 0;
-    }
-
-    // Move assignment operator
-    BlobData& operator=(BlobData&& other) noexcept {
-        if (this != &other) {
-            delete[] buffer;
-            buffer = other.buffer;
-            size = other.size;
-            other.buffer = nullptr;
-            other.size = 0;
-        }
-        return *this;
-    }
-
-private:
-    uint8_t* buffer;
-    int size;
-};
 
 using EcmMessageMap = std::unordered_map<std::string, std::variant<std::string, double, bool>>;
 ElroyLogLoader::ElroyLogLoader(){
@@ -146,6 +100,95 @@ bool ElroyLogLoader::ParseEcmToPlotjuggler(const uint8_t* raw_data, size_t byte_
   }
   return true;
 }
+bool ElroyLogLoader::MultithreadProcess(std::vector<BlobData> &data, size_t start_idx, size_t end_idx, size_t n_threads, std::string delim){
+  // This function should start multiple threads and process data in order
+  std::vector<std::vector<EcmMessageMap>> messages(n_threads);
+  std::vector<std::thread> threads;
+  const size_t chunkSize = data.size() / n_threads;
+  const size_t numRows = end_idx - start_idx; // number of rows in chunk
+  size_t n  = 0;
+  std::mutex mux;
+  std::cout << std::endl;
+  // Parse each message
+  for (size_t thread_idx = 0; thread_idx < n_threads; ++thread_idx) {
+    size_t startIndex = thread_idx * chunkSize;
+    size_t endIndex = (thread_idx == n_threads - 1) ? numRows : (thread_idx + 1) * chunkSize;
+    // const auto& maps = ParseToEcmMap(data_ptrs[j].getData(), data_ptrs[j].getSize(), delim);
+    threads.emplace_back([this, &n,&mux, &messages, &data, thread_idx, startIndex, endIndex, numRows, delim](){ /*&data_ptrs*/
+      for(size_t j = startIndex; j < endIndex; ++j){
+        const auto& maps = ParseToEcmMap(data[j].getData(), data[j].getSize(), delim);
+        messages[thread_idx].insert(messages[thread_idx].end(), maps.begin(), maps.end());
+        {
+          std::lock_guard<std::mutex> lock(mux);
+          std::cout << ++n << "\r" << std::flush;
+        }
+      }
+    });
+  }
+  for (auto& thread : threads) {
+    thread.join();
+  }
+  std::cout << std::endl;
+  std::cout << "Done loading chunk" << std::endl;
+  //map of keys to timestamp and instance id fields for each message
+  std::unordered_map<std::string, std::string> message_to_timestamp;
+  std::unordered_map<std::string, std::string> message_to_instance_id;
+  // Once I have each message parsed, write the data to plotjuggler
+  for(const auto& message_thread : messages){
+    for(const auto& map : message_thread){
+      // One message is an EcmMessageMap
+
+      // Find the type of the message
+      std::string first_key = map.begin()->first;
+      size_t pos = first_key.find(delim);
+      std::string message_type = map.begin()->first;
+      std::string instance_id = "";
+      if (pos != std::string::npos){
+        message_type = message_type.substr(0,pos);
+      }
+      // Find the key that points to the instance id of this message type
+      if(message_to_instance_id.find(message_type) == message_to_instance_id.end()){
+        std::string instance_key;
+        const std::string instance_suffix = "component" + delim + "instance"; 
+        for(auto it = map.begin(); it!= map.end(); ++it){
+          const std::string& key = it->first;
+          if(key.size() > instance_suffix.size() && key.compare(key.size() - instance_suffix.size(), instance_suffix.size(), instance_suffix) == 0 ){
+            message_to_instance_id.insert({message_type, key});
+          }
+        }
+      }
+      // Find the key that points to the timestamp of this message type
+      if(message_to_timestamp.find(message_type) == message_to_timestamp.end()){
+        std::string timestamp_key;
+        const std::string timestamp_suffix = "BusObject" + delim + "write_timestamp_ns";
+        for(auto it = map.begin(); it!= map.end(); ++it){
+          const std::string& key = it->first;
+          if(key.size() > timestamp_suffix.size() && key.compare(key.size() - timestamp_suffix.size(), timestamp_suffix.size(), timestamp_suffix) == 0 ){
+            message_to_timestamp.insert({message_type, key});
+          }
+        }
+      }
+      // Get the timestamp and instance id
+      const auto& timestamp_key = message_to_timestamp.at(message_type);
+      const double timestamp = std::get<double>(map.at(timestamp_key)) / 1e9;
+      if(message_to_instance_id.find(message_type) != message_to_instance_id.end()){
+        const auto& instance_key = message_to_instance_id.at(message_type);
+        instance_id = "_"+  std::to_string(static_cast<size_t>(std::get<double>(map.at(instance_key))));
+      }
+      // For each entry in the map, add it to plotjuggler
+      for (const auto& pair: map){
+        std::string field_name_str = pair.first;
+        if(instance_id.size() > 0)
+          field_name_str = field_name_str.insert(field_name_str.find(delim), "_"+instance_id);
+        QString field_name = QString::fromStdString(field_name_str);
+        WriteToPlotjugglerThreadSafe(field_name, pair.second, timestamp);
+      }
+    }
+  }
+
+  return true;
+}
+
 bool ElroyLogLoader::readDataFromFile_multithread(PJ::FileLoadInfo* fileload_info,
                       PlotDataMapRef& plot_data){
   auto startTime = std::chrono::high_resolution_clock::now();
@@ -213,6 +256,26 @@ bool ElroyLogLoader::readDataFromFile_multithread(PJ::FileLoadInfo* fileload_inf
       BlobData myBlob(sqlite3_column_blob(stmt, 1), byte_array_len);
       data_ptrs.push_back(std::move(myBlob)); // 2.03 sec to load 1.5 GB
   }   
+
+  // multiprocessing in order
+  size_t chunk_size = 10000;
+  size_t n_chunks = static_cast<size_t>(std::ceil(static_cast<double>(data_ptrs.size()) / chunk_size));
+  for(size_t i = 0; i < n_chunks; ++i){
+    size_t start = i * chunk_size;
+    size_t end = (i == n_chunks - 1) ? data_ptrs.size() : (i + 1) * chunk_size;
+    std::cout << "start "<<start << " end "<<end <<std::endl;
+    MultithreadProcess(data_ptrs, start, end);
+    break;
+  }
+
+
+  std::cout << std::endl;
+  auto endTime1 = std::chrono::high_resolution_clock::now();
+  auto duration3 = std::chrono::duration_cast<std::chrono::milliseconds>(endTime1 - startTime);
+  std::cout << "Time to write to plotjuggler: " << duration3.count()/1000.0 << " seconds" << std::endl;
+  return true;
+  //below this, multiprocessing didn't do things in order
+
 
   auto copyEndTime = std::chrono::high_resolution_clock::now();
   auto duration1 = std::chrono::duration_cast<std::chrono::milliseconds>(copyEndTime - startTime);

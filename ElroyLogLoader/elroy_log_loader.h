@@ -10,8 +10,57 @@
 #include <QObject>
 #include <QtPlugin>
 #include "PlotJuggler/dataloader_base.h"
+#include <cstring>
 
 using namespace PJ;
+
+
+class BlobData {
+public:
+    BlobData(const void* data, int size) : size(size) {
+        // Allocate memory and copy the BLOB data
+        if (size > 0) {
+            buffer = new uint8_t[size];
+            std::memcpy(buffer, data, size);
+        }
+    }
+
+    ~BlobData() {
+        // Release allocated memory
+        delete[] buffer;
+    }
+
+    // Accessors
+    const uint8_t* getData() const {
+        return buffer;
+    }
+
+    int getSize() const {
+        return size;
+    }
+
+    // Move constructor
+    BlobData(BlobData&& other) noexcept : buffer(other.buffer), size(other.size) {
+        other.buffer = nullptr;
+        other.size = 0;
+    }
+
+    // Move assignment operator
+    BlobData& operator=(BlobData&& other) noexcept {
+        if (this != &other) {
+            delete[] buffer;
+            buffer = other.buffer;
+            size = other.size;
+            other.buffer = nullptr;
+            other.size = 0;
+        }
+        return *this;
+    }
+
+private:
+    uint8_t* buffer;
+    int size;
+};
 
 class ElroyLogLoader : public DataLoader
 {
@@ -45,8 +94,12 @@ private:
   using EcmMessageListMap = std::unordered_map<std::string, std::vector<std::variant<std::string, double, bool>>>;
   void WriteToPlotjugglerThreadSafe(const QString& field_name, const std::variant<std::string, double, bool> &data, double timestamp);
   bool ParseEcmToPlotjuggler(const uint8_t* const buf, size_t buff_len, const std::string& delim = "/");
+
   std::vector<EcmMessageMap> ParseToEcmMap(const uint8_t* const buf, size_t buff_len, const std::string& delim = "/");
 
+  // This processes a small bunch of data, multithreaded. Once the data is all done it writes it to plotjuggler
+  bool MultithreadProcess(std::vector<BlobData> &data, size_t start_idx, size_t end_idx, size_t n_threads = 8, std::string delim="/");
+  
   std::vector<const char*> _extensions;
 
   std::string _default_time_axis;
