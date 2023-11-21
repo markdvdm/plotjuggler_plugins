@@ -35,12 +35,24 @@ public:
   };
   std::vector<std::unordered_map<std::string, std::variant<std::string, double, bool>>> ParseOnePacketToMap(pcpp::RawPacket &packet, const std::string &delim = "/")const;
   std::unordered_map<std::string, std::vector<std::variant<std::string, double, bool>>> ProcessPackets(std::vector<pcpp::RawPacket> &vec, size_t start_idx, size_t end_idx) const;
+  
+  // @brief this is the entry point that plotjuggler will call. This function contains the single-threaded implementation
   bool readDataFromFile(PJ::FileLoadInfo* fileload_info,
                         PlotDataMapRef& destination) override;
+
+  // @brief This is the multithreaded implementation, converting each ECM into its own C++ map. Each key
+  // has exactly one value. This means the memory usage is way too high and this will only work for very
+  // small pcap files.
   bool readDataFromFile_mulithread(PJ::FileLoadInfo* fileload_info,
                         PlotDataMapRef& destination);
+
+  // @brief This is the multithreaded implementation, converting ECMs into a C++ map, where the key is
+  // the field name and the value is a vector of the field's data. This means there is only one map and
+  // this uses significantly less memory than readDataFromFile_multithread                        
   bool readDataFromFile_mulithread_old(PJ::FileLoadInfo* fileload_info,
                         PlotDataMapRef& destination);
+
+  // @brief An attempt to use std::transform for multiprocessing but I couldn't get this to work.                   
   bool readDataFromFile_transform(PJ::FileLoadInfo* fileload_info,
                         PlotDataMapRef& destination);                      
 

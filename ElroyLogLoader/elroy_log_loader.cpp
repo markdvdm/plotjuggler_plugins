@@ -71,31 +71,50 @@ bool ElroyLogLoader::ParseEcmToPlotjuggler(const uint8_t* raw_data, size_t byte_
     // Find the instance ID and rename
     if (map.size() == 0)
       continue;
-    // Get the instance id
-    std::string instance_key = "component" + delim + "instance"; 
-    std::string instance_id = "";
-    double instance_component = 0;
-    for(auto it = map.begin(); it!= map.end(); ++it){
-      const std::string& key = it->first;
-      if(key.size() > instance_key.size() && key.compare(key.size() - instance_key.size(), instance_key.size(), instance_key) == 0 ){
-        instance_id = "_"+  std::to_string(static_cast<size_t>(std::get<double>(map.at(key))));
+    // Find the type of the message
+    std::string first_key = map.begin()->first;
+    size_t pos = first_key.find(delim);
+    std::string message_type = map.begin()->first;
+    if (pos != std::string::npos){
+      message_type = message_type.substr(0,pos);
+    }
+    // Find the key that points to the instance id of this message type
+    if(_message_to_instance_id.find(message_type) == _message_to_instance_id.end()){
+      std::string instance_key;
+      const std::string instance_suffix = "component" + delim + "instance"; 
+      for(auto it = map.begin(); it!= map.end(); ++it){
+        const std::string& key = it->first;
+        if(key.size() > instance_suffix.size() && key.compare(key.size() - instance_suffix.size(), instance_suffix.size(), instance_suffix) == 0 ){
+          _message_to_instance_id.insert({message_type, key});
+        }
       }
+    }
+    // Find the key that points to the timestamp of this message type
+    if(_message_id_to_timestamp_id.find(message_type) == _message_id_to_timestamp_id.end()){
+      std::string timestamp_key;
+      const std::string timestamp_suffix = "BusObject" + delim + "write_timestamp_ns";
+      for(auto it = map.begin(); it!= map.end(); ++it){
+        const std::string& key = it->first;
+        if(key.size() > timestamp_suffix.size() && key.compare(key.size() - timestamp_suffix.size(), timestamp_suffix.size(), timestamp_suffix) == 0 ){
+          _message_id_to_timestamp_id.insert({message_type, key});
+        }
+      }
+    }
+    // Get the instance id
+    std::string instance_id = "";
+    if(_message_to_instance_id.find(message_type) != _message_to_instance_id.end()){
+      const std::string& instance_key = _message_to_instance_id[message_type]; 
+      instance_id = "_"+  std::to_string(static_cast<size_t>(std::get<double>(map.at(instance_key))));
     }
     // Get the timestamp
-    double timestamp = 0;
-    std::string timestamp_key = "BusObject" + delim + "write_timestamp_ns";
-    for(auto it = map.begin(); it!= map.end(); ++it){
-      const std::string& key = it->first;
-      if(key.size() > timestamp_key.size() && key.compare(key.size() - timestamp_key.size(), timestamp_key.size(), timestamp_key) == 0 ){
-        timestamp = std::get<double>(map.at(key)) / 1e9;
-      }
-    }
+    std::string timestamp_key = _message_id_to_timestamp_id[message_type];
+    double timestamp = std::get<double>(map[timestamp_key]) / 1e9;
     // Write each element from the ecm message map to plotjuggler
     for (const auto& pair: map){
       std::string field_name_str = pair.first;
       field_name_str = field_name_str.insert(field_name_str.find(delim), "_"+instance_id);
       QString field_name = QString::fromStdString(field_name_str);
-      // WriteToPlotjugglerThreadSafe(field_name, pair.second, timestamp);
+      WriteToPlotjugglerThreadSafe(field_name, pair.second, timestamp);
     }
   }
   return true;
@@ -664,9 +683,8 @@ bool ElroyLogLoader::readDataFromFile_multithread(PJ::FileLoadInfo* fileload_inf
 // }
 bool ElroyLogLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
                       PlotDataMapRef& plot_data){
-  return readDataFromFile_multithread(fileload_info, plot_data);                        
+  // return readDataFromFile_multithread(fileload_info, plot_data);  // Uncomment this to use the multithreaded implementation                      
   auto startTime = std::chrono::high_resolution_clock::now();
-  int numThreads = 8;
   std::string delim = "/";
   _plot_data = &plot_data;
 
@@ -718,7 +736,7 @@ bool ElroyLogLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
   size_t n_msgs = 0;
   // Execute the query and retrieve data
   while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
-      std::cout << count << " of " << numRows << std::endl;
+      std::cout << count << " of " << numRows << " " << 100 * count / numRows << "%\r" << std::flush;
       ++count;
       // Access the columns of the current row
       int timestamp = sqlite3_column_int(stmt, 0);
@@ -730,67 +748,6 @@ bool ElroyLogLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
       ParseEcmToPlotjuggler(raw_data, byte_array_len, delim);
       if (count > 10000)
         break;
-      continue;
-
-
-      size_t bytes_processed = 0;
-      size_t current_index = 0;
-      while (current_index < byte_array_len){
-        EcmMessageMap map;
-        elroy_common_msg::MessageDecoderResult res;
-        if (!decoder.DecodeAsMap(raw_data + current_index , byte_array_len-current_index, bytes_processed, map, res, delim)){
-          break;
-        }
-        current_index += bytes_processed;
-        // Find the instance ID and rename
-        if (map.size() == 0)
-          continue;
-        // Get the instance id
-        std::string instance_key = "component" + delim + "instance"; 
-        std::string instance_id = "";
-        double instance_component = 0;
-        for(auto it = map.begin(); it!= map.end(); ++it){
-          const std::string& key = it->first;
-          if(key.size() > instance_key.size() && key.compare(key.size() - instance_key.size(), instance_key.size(), instance_key) == 0 ){
-            instance_id = "_"+  std::to_string(static_cast<size_t>(std::get<double>(map.at(key))));
-          }
-        }
-        // Get the timestamp
-        double timestamp = 0;
-        std::string timestamp_key = "BusObject" + delim + "write_timestamp_ns";
-        for(auto it = map.begin(); it!= map.end(); ++it){
-          const std::string& key = it->first;
-          if(key.size() > timestamp_key.size() && key.compare(key.size() - timestamp_key.size(), timestamp_key.size(), timestamp_key) == 0 ){
-            timestamp = std::get<double>(map.at(key)) / 1e9;
-          }
-        }
-        // Write each element from the ecm message map to plotjuggler
-        for (const auto& pair: map){
-          n_msgs++;
-          std::string field_name_str = pair.first;
-          field_name_str = field_name_str.insert(field_name_str.find(delim), "_"+instance_id);
-          QString field_name = QString::fromStdString(field_name_str);
-
-          // Add a new column to the plotter if it does not already exist
-          if ((std::holds_alternative<double>(pair.second) || std::holds_alternative<bool>(pair.second)) && plots_map.find(field_name) == plots_map.end()){
-            auto it = plot_data.addNumeric(field_name.toStdString());
-            plots_map[field_name] = (&(it->second));
-          }
-          else if (std::holds_alternative<std::string>(pair.second) && string_map.find(field_name) == string_map.end()){
-            auto it = plot_data.addStringSeries(field_name.toStdString());
-            string_map[field_name] = (&(it->second));
-          }
-          // Add the data to the plotter
-          if(std::holds_alternative<double>(pair.second)){
-            PlotData::Point point(timestamp, std::get<double>(pair.second));
-            plots_map[field_name]->pushBack(point);
-          }else if(std::holds_alternative<std::string>(pair.second)){
-            string_map[field_name]->pushBack({timestamp, std::get<std::string>(pair.second)});
-            continue;
-          }
-        }
-        // maps.push_back(map);
-      }
   }
   auto endTime = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);

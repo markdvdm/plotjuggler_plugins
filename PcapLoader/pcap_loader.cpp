@@ -75,18 +75,6 @@ std::vector<EcmMessageMap> PcapLoader::ParseOnePacketToMap(pcpp::RawPacket &pack
       break;
     }
     current_index += bytes_processed;
-    // if(map.size() > 0){
-    //   // Find the timestamp, in BusObject/write_timestamp_ns
-    //   double timestamp = 0;
-    //   std::string timestamp_key = "BusObject" + delim + "write_timestamp_ns";
-    //   for(auto it = map.begin(); it!= map.end(); ++it){
-    //     const std::string& key = it->first;
-    //     if(key.size() > timestamp_key.size() && key.compare(key.size() - timestamp_key.size(), timestamp_key.size(), timestamp_key) == 0 ){
-    //       timestamp = std::get<double>(map[key]) / 1e9;
-    //       // map["time_s"] = timestamp;
-    //     }
-    //   }
-    // }
     maps.push_back(map);
   }
   return maps;
@@ -337,7 +325,7 @@ bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
   std::map<QString, PlotData*> plots_map;
   std::map<QString, PJ::StringSeries*> string_map;
 
-  // // Schema for ip addresses
+  // Schema for ip addresses
   // std::map<std::string, std::string> ip_src_addr_to_folder_name;
   // ip_src_addr_to_folder_name["172.16.17.11"] = "MfcA";
   std::unordered_map<std::string, std::vector<std::variant<std::string, double, bool>>> map_of_vec;
@@ -349,13 +337,14 @@ bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
         std::string instance_key = "component" + delim + "instance"; 
         std::string instance_id = "";
         double instance_component = 0;
-        // double timestamp = std::get<double>(map[std::string("time_s")]);
+        // Search for the instance ID string
         for(auto it = map.begin(); it!= map.end(); ++it){
           const std::string& key = it->first;
           if(key.size() > instance_key.size() && key.compare(key.size() - instance_key.size(), instance_key.size(), instance_key) == 0 ){
             instance_id = "_"+  std::to_string(static_cast<size_t>(std::get<double>(map[key])));
           }
         }
+        // Search for the timestamp
         double timestamp = 0;
         std::string timestamp_key = "BusObject" + delim + "write_timestamp_ns";
         for(auto it = map.begin(); it!= map.end(); ++it){
@@ -369,10 +358,6 @@ bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
           field_name_str = field_name_str.insert(field_name_str.find(delim), "_"+instance_id);
           // QString field_name = QString::fromStdString(pair.first);
           QString field_name = QString::fromStdString(field_name_str);
-          // if (pair.first.find("VlThrusterState") != std::string::npos){
-          //   std::cout << pair.first << std::endl;
-          // }
-
           // Add a new column to the plotter if it does not already exist
           if ((std::holds_alternative<double>(pair.second) || std::holds_alternative<bool>(pair.second)) && plots_map.find(field_name) == plots_map.end()){
             auto it = plot_data.addNumeric(field_name.toStdString());
@@ -509,19 +494,14 @@ bool PcapLoader::readDataFromFile(PJ::FileLoadInfo* fileload_info,
   }else{
     std::cout << "map of vec is empty" << std::endl;
   }
-
-  // for each msg in the pcap file, call the ecm parser
-  // for each message type I need to get the data from it to add to the destination
-  //   Can I iterate over an object as if it were a dict? No, C++ does not have reflection
-  //   Only solution is to add a GetData() function to the ecm parser that provides a list
-  //   of all the data members in a message (and sub-messages). Then I could go over these
-  //   and recursively unpack the data so I can add it to the plotjuggler destination. 
   auto endTime = std::chrono::high_resolution_clock::now();
   auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
   std::cout << "Time taken by function: " << duration.count()/1000.0 << " seconds" << std::endl;
   return true;                         
 }
 
+// This is an example program that I'm using for development/debugging. Change the 
+// file_info.filename to a pcap file on your computer and run ~/build/PcapLoaderExec
 int main()
 {
   PcapLoader pcap;

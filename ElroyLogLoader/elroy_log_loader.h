@@ -109,6 +109,10 @@ private:
   // Pointers pointers to plotjuggler string plots (this only displays the strings in the tree and does not plot them)
   std::unordered_map<QString, PJ::StringSeries*> _string_map;
 
+  //map of keys to timestamp and instance id fields for each message
+  std::unordered_map<std::string, std::string> _message_id_to_timestamp_id;
+  std::unordered_map<std::string, std::string> _message_to_instance_id;
+
   // Mutex for writing to plotjuggler
   std::mutex _plotjuggler_mutex;
   PlotDataMapRef* _plot_data;
